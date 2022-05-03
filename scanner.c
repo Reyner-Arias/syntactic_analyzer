@@ -96,6 +96,5 @@ token getToken(){
             tok.code = atoi(token_buffer);
         }
     }
-    
     return tok;
 }
