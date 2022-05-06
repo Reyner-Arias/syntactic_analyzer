@@ -7,8 +7,11 @@
 typedef char string [MAXSTLEN*4];
 char buffer[MAXSTLEN*4];
 int buffer_index = 0;
+char line_buffer[MAXSTLEN*8];
+int line_buffer_index = 0;
 string ancestors[512];
 int ancestorsIndex = 0;
+int fileCounter = 0;
 
 typedef struct Tuples
 {
@@ -46,6 +49,21 @@ void buffer_char(char c){
     }
 }
 
+void clear_line_buffer(void){
+    memset(line_buffer, 0, sizeof line_buffer);
+    line_buffer_index = 0;
+}
+
+void line_buffer_char(char c){
+    line_buffer[line_buffer_index] = c;
+    line_buffer_index++;
+    if (line_buffer_index > MAXSTLEN*8-1)
+    {
+        printf("Buffer overflow\n");
+        exit(-1);
+    }
+}
+
 void concatArray(newArray* original, newArray* extension){
     for (int i = 0; i < extension->index; i++)
     {
@@ -58,9 +76,9 @@ void concatArray(newArray* original, newArray* extension){
     }
 }
 
-newArray preprocessing(string pfileName){
+newArray preprocessing(string pfileName, newArray ancestorsDef){
     newArray localDef, ancestorsDef, acumulatedDef;
-
+    
     string fileName;
     strcpy(fileName, pfileName);
     if(ancestorsIndex < 512) strcpy(ancestors[ancestorsIndex++], fileName);
@@ -68,4 +86,144 @@ newArray preprocessing(string pfileName){
         printf("Call stack reached his limit\n");
         exit(-1);
     }
+
+    int multLineCom = 0;
+    localDef.index = 0;
+    acumulatedDef.index = 0;
+    int in_char, c;
+
+    concatArray(&localDef, &ancestorsDef);
+
+    //Remove comments to simplify the code
+    FILE *inFile = fopen(fileName, "r");
+    if (inFile == NULL)
+    {
+        printf("Error! Could not open file\n");
+        exit(-1);
+    }
+    char tempfile[12];
+    sprintf(tempfile, "wComm%d.c", fileCounter);
+    fileCounter++;
+
+    FILE *wComments = fopen(tempfile, "w");
+
+    while ((in_char = getc(inFile)) != EOF){
+        if(in_char == '/'){
+            in_char = getc(inFile);
+            if(in_char == '/'){
+                for (c = getc(inFile); c != '\n' && c != EOF; c = getc(inFile));
+                ungetc(c, inFile);
+            } else if (in_char == '*'){
+                multLineCom = 1;
+            } else {
+                if(multLineCom == 0) {
+                    fprintf(wComments, "/%c", in_char);
+                }
+            }
+        } else if(in_char == '*'){
+            in_char = getc(inFile);
+            if (in_char == '/'){
+                multLineCom = 0;
+            } else {
+                if(multLineCom == 0) {
+                    fprintf(wComments, "*%c", in_char);
+                }
+            }
+        } else {
+            if(multLineCom == 0) {
+                fprintf(wComments, "%c", in_char);
+            }
+        }
+    }
+    if(multLineCom == 1) {
+        printf("Warning: Expected a comment enclosed before end of file\n");
+    }
+    fclose(inFile);
+    fclose(wComments);
+
+
+    // Start analyzing the file without comments
+    FILE *file = fopen(tempfile, "r");
+    if (file == NULL)
+    {
+        printf("Error! Could not open file\n");
+        return;
+    }
+    FILE *tmp = fopen("cTemp.c", "a+");
+
+    clear_line_buffer();
+    while ((in_char = getc(file)) != EOF){
+        if(in_char == '\n' || in_char == EOF){
+            clear_line_buffer();
+        } else {
+            line_buffer_char(in_char);
+        }
+        if (in_char == '#'){
+            clear_buffer();
+            for (c = getc(file); isalpha(c); c = getc(file)){
+                buffer_char(c);
+                line_buffer_char(c);
+            }
+            ungetc(c, file);
+            /*if (!strcmp(buffer, "include"))
+            {
+                clear_buffer();
+                for(c = getc(file); c != '<' && c != '\"' && c != '\n' && c != EOF; c = getc(file)){
+                    line_buffer_char(c);
+                }
+                if(c == '<'){
+                    for (c = getc(file); quotes < 2 && angular != 2; c = getc(file)){
+                        line_buffer_char(c);
+                        if (c == '\"' && angular == 0)
+                        {   
+                            quotes++;
+                        } else if (c == '<' && quotes == 0){
+                            angular = 1;
+                        } else if (c == '>' && angular == 1 && quotes == 0){
+                            angular = 2;
+                        } else if (c == '\n')
+                        {
+                            printf("Warning: There are not enough quotes in the #include directive\n");
+                            fprintf(tmp, "%s", line_buffer);
+                            clear_line_buffer();
+                            continue;
+                        } else if (c == '/' || c == 0)
+                        {
+                            printf("Warning: Invalid character in a file\n");
+                            ungetc(c, file);
+                            line_buffer[line_buffer_index-1] = 0;
+                            line_buffer_index--;
+                            fprintf(tmp, "%s", line_buffer);
+                            continue;
+                        } else if (quotes >= 1 || angular == 1)
+                        {
+                            buffer_char(c);
+                        } else if (!isspace(c))
+                        {
+                            printf("Warning: Expected filename\n");
+                            fprintf(tmp, "%s", line_buffer);
+                            continue;
+                        }
+                    }
+                    if (buffer_index == 0)
+                    {
+                        printf("Warning: Expected filename\n");
+                        fprintf(tmp, "%s", line_buffer);
+                        continue;
+                    }
+                    if(!isInclude(buffer, ancestors, ancestorsIndex)){
+                        acumulatedDef = preprocessing(buffer, localDef);
+                        concatArray(&acumulatedDef, &localDef);
+                    } else {
+                        printf("There is a cycle in the include directives\n");
+                        continue;
+                    }
+                } else if(c == '\"'){
+
+                }
+            } */
+        }
+    }
+
+    remove(tempfile);
 }
