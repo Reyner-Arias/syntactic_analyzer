@@ -5,12 +5,12 @@
 %}
 
 %token LPAREN RPAREN LSQBRACKET RSQBRACKET LBRACKET RBRACKET
-%token SEMICOLON COMMA NEWLINE
+%token SEMICOLON COMMA NEWLINE COLON POINT
 %token ID INTLITERAL FLOATLITERAL DOUBLELITERAL HEXLITERAL HEXLITERALFLOAT CHARLITERAL STRINGLITERAL
-%token INVALIDSUFFIX
+%token INVALIDSUFFIX AND MUL ADD SUB TILDE NOT DIV MOD L_THAN G_THAN XOR OR QUESTION
 %token SIZEOF INC_OP DEC_OP PTR_OP DEFAULT LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP AND_OP OR_OP
 %token MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN XOR_ASSIGN OR_ASSIGN
-%token TYPEDEF EXTERN STATIC THREAD_LOCAL AUTO REGISTER
+%token TYPEDEF EXTERN STATIC THREAD_LOCAL AUTO REGISTER NORETURN STATIC_ASSERT FUNC_NAME
 %token VOID CHAR SHORT INT LONG FLOAT DOUBLE SIGNED UNSIGNED BOOL COMPLEX IMAGINARY TYPEDEF_NAME STRUCT UNION
 %token ENUM CONST RESTRICT VOLATILE ATOMIC CASE IF SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
@@ -47,11 +47,11 @@ enumeration_constant
 
 string
     : STRINGLITERAL
-    | "__func__" 
+    | FUNC_NAME
     ;
 
 generic_selection
-    : "_Generic" LPAREN assignment_expression COMMA generic_assoc_list RPAREN
+    : GENERIC LPAREN assignment_expression COMMA generic_assoc_list RPAREN
     ;
 
 generic_assoc_list
@@ -60,7 +60,7 @@ generic_assoc_list
     ;
 
 generic_association 
-    : type_name ':' assignment_expression
+    : type_name COLON assignment_expression
     | DEFAULT assignment_expression
     ;
 
@@ -69,7 +69,7 @@ postfix_expression
     | postfix_expression LSQBRACKET expression RSQBRACKET
     | postfix_expression LPAREN RPAREN
     | postfix_expression LPAREN argument_expression_list RPAREN
-    | postfix_expression '.' ID
+    | postfix_expression POINT ID
     | postfix_expression PTR_OP ID
     | postfix_expression INC_OP 
     | postfix_expression DEC_OP
@@ -89,16 +89,16 @@ unary_expression
     | unary_operator cast_expression
     | SIZEOF unary_expression
     | SIZEOF LPAREN type_name RPAREN
-    | "_Alignof" LPAREN type_name RPAREN
+    | ALIGNOF LPAREN type_name RPAREN
     ;
 
 unary_operator
-	: '&'
-	| '*'
-	| '+'
-	| '-'
-	| '~'
-	| '!'
+	: AND
+	| MUL
+	| ADD
+	| SUB
+	| TILDE
+	| NOT
 	;
 
 cast_expression
@@ -108,15 +108,15 @@ cast_expression
 
 multiplicative_expression
 	: cast_expression
-	| multiplicative_expression '*' cast_expression
-	| multiplicative_expression '/' cast_expression
-	| multiplicative_expression '%' cast_expression
+	| multiplicative_expression MUL cast_expression
+	| multiplicative_expression DIV cast_expression
+	| multiplicative_expression MOD cast_expression
 	;
 
 additive_expression
 	: multiplicative_expression
-	| additive_expression '+' multiplicative_expression
-	| additive_expression '-' multiplicative_expression
+	| additive_expression ADD multiplicative_expression
+	| additive_expression SUB multiplicative_expression
 	;
 
 shift_expression
@@ -127,8 +127,8 @@ shift_expression
 
 relational_expression
 	: shift_expression
-	| relational_expression '<' shift_expression
-	| relational_expression '>' shift_expression
+	| relational_expression l_THAN shift_expression
+	| relational_expression G_THAN shift_expression
 	| relational_expression LE_OP shift_expression
 	| relational_expression GE_OP shift_expression
 	;
@@ -141,17 +141,17 @@ equality_expression
 
 and_expression
 	: equality_expression
-	| and_expression '&' equality_expression
+	| and_expression AND equality_expression
 	;
 
 exclusive_or_expression
 	: and_expression
-	| exclusive_or_expression '^' and_expression
+	| exclusive_or_expression XOR and_expression
 	;
 
 inclusive_or_expression
 	: exclusive_or_expression
-	| inclusive_or_expression '|' exclusive_or_expression
+	| inclusive_or_expression OR exclusive_or_expression
 	;
 
 logical_and_expression
@@ -166,7 +166,7 @@ logical_or_expression
 
 conditional_expression
 	: logical_or_expression
-	| logical_or_expression '?' expression ':' conditional_expression
+	| logical_or_expression QUESTION expression COLON conditional_expression
 	;
 
 assignment_expression
@@ -175,7 +175,7 @@ assignment_expression
 	;
 
 assignment_operator
-	: '='
+	: EQU
 	| MUL_ASSIGN
 	| DIV_ASSIGN
 	| MOD_ASSIGN
@@ -190,7 +190,7 @@ assignment_operator
 
 expression
 	: assignment_expression
-	| expression ',' assignment_expression
+	| expression COMMA assignment_expression
 	;
 
 constant_expression
@@ -218,11 +218,11 @@ declaration_specifiers
 
 init_declarator_list
 	: init_declarator
-	| init_declarator_list ',' init_declarator
+	| init_declarator_list COMMA init_declarator
 	;
 
 init_declarator
-	: declarator '=' initializer
+	: declarator EQU initializer
 	| declarator
 	;
 
@@ -256,8 +256,8 @@ type_specifier
 
 struct_or_union_specifier
 	: struct_or_union LBRACKET struct_declaration_list RBRACKET
-	| struct_or_union IDENTIFIER LBRACKET struct_declaration_list RBRACKET
-	| struct_or_union IDENTIFIER
+	| struct_or_union ID LBRACKET struct_declaration_list RBRACKET
+	| struct_or_union ID
 	;
 
 struct_or_union
@@ -285,35 +285,35 @@ specifier_qualifier_list
 
 struct_declarator_list
 	: struct_declarator
-	| struct_declarator_list ',' struct_declarator
+	| struct_declarator_list COMMA struct_declarator
 	;
 
 struct_declarator
-	: ':' constant_expression
-	| declarator ':' constant_expression
+	: COLON constant_expression
+	| declarator COLON constant_expression
 	| declarator
 	;
 
 enum_specifier
-	: ENUM '{' enumerator_list '}'
-	| ENUM '{' enumerator_list ',' '}'
-	| ENUM IDENTIFIER '{' enumerator_list '}'
-	| ENUM IDENTIFIER '{' enumerator_list ',' '}'
-	| ENUM IDENTIFIER
+	: ENUM LBRACKET enumerator_list RBRACKET
+	| ENUM LBRACKET enumerator_list COMMA RBRACKET
+	| ENUM ID LBRACKET enumerator_list RBRACKET
+	| ENUM ID LBRACKET enumerator_list COMMA RBRACKET
+	| ENUM ID
 	;
 
 enumerator_list
 	: enumerator
-	| enumerator_list ',' enumerator
+	| enumerator_list COMMA enumerator
 	;
 
 enumerator	/* identifiers must be flagged as ENUMERATION_CONSTANT */
-	: enumeration_constant '=' constant_expression
+	: enumeration_constant EQU constant_expression
 	| enumeration_constant
 	;
 
 atomic_type_specifier
-	: ATOMIC '(' type_name ')'
+	: ATOMIC LPAREN type_name RPAREN
 	;
 
 type_qualifier
@@ -324,13 +324,13 @@ type_qualifier
 	;
 
 function_specifier
-	: "inline"
-	| "_Noreturn"
+	: INLINE
+	| NORETURN
 	;
 
 alignment_specifier
-	: "_Alignas" '(' type_name ')'
-	| "_Alignas" '(' constant_expression ')'
+	: ALIGNAS LPAREN type_name RPAREN
+	| ALIGNAS LPAREN constant_expression RPAREN
 	;
 
 declarator
@@ -339,27 +339,27 @@ declarator
 	;
 
 direct_declarator
-	: IDENTIFIER
-	| '(' declarator ')'
-	| direct_declarator '[' ']'
-	| direct_declarator '[' '*' ']'
-	| direct_declarator '[' STATIC type_qualifier_list assignment_expression ']'
-	| direct_declarator '[' STATIC assignment_expression ']'
-	| direct_declarator '[' type_qualifier_list '*' ']'
-	| direct_declarator '[' type_qualifier_list STATIC assignment_expression ']'
-	| direct_declarator '[' type_qualifier_list assignment_expression ']'
-	| direct_declarator '[' type_qualifier_list ']'
-	| direct_declarator '[' assignment_expression ']'
-	| direct_declarator '(' parameter_type_list ')'
-	| direct_declarator '(' ')'
-	| direct_declarator '(' identifier_list ')'
+	: ID
+	| LPAREN declarator RPAREN
+	| direct_declarator LSQBRACKET RSQBRACKET
+	| direct_declarator LSQBRACKET MUL RSQBRACKET
+	| direct_declarator LSQBRACKET STATIC type_qualifier_list assignment_expression RSQBRACKET
+	| direct_declarator LSQBRACKET STATIC assignment_expression RSQBRACKET
+	| direct_declarator LSQBRACKET type_qualifier_list MUL RSQBRACKET
+	| direct_declarator LSQBRACKET type_qualifier_list STATIC assignment_expression RSQBRACKET
+	| direct_declarator LSQBRACKET type_qualifier_list assignment_expression RSQBRACKET
+	| direct_declarator LSQBRACKET type_qualifier_list RSQBRACKET
+	| direct_declarator LSQBRACKET assignment_expression RSQBRACKET
+	| direct_declarator LPAREN parameter_type_list RPAREN
+	| direct_declarator LPAREN RPAREN
+	| direct_declarator LPAREN identifier_list RPAREN
 	;
 
 pointer
-	: '*' type_qualifier_list pointer
-	| '*' type_qualifier_list
-	| '*' pointer
-	| '*'
+	: MUL type_qualifier_list pointer
+	| MUL type_qualifier_list
+	| MUL pointer
+	| MUL
 	;
 
 type_qualifier_list
@@ -369,13 +369,13 @@ type_qualifier_list
 
 
 parameter_type_list
-	: parameter_list ',' ELLIPSIS
+	: parameter_list COMMA ELLIPSIS
 	| parameter_list
 	;
 
 parameter_list
 	: parameter_declaration
-	| parameter_list ',' parameter_declaration
+	| parameter_list COMMA parameter_declaration
 	;
 
 parameter_declaration
@@ -385,8 +385,8 @@ parameter_declaration
 	;
 
 identifier_list
-	: IDENTIFIER
-	| identifier_list ',' IDENTIFIER
+	: ID
+	| identifier_list COMMA ID
 	;
 
 type_name
@@ -401,44 +401,44 @@ abstract_declarator
 	;
 
 direct_abstract_declarator
-	: '(' abstract_declarator ')'
-	| '[' ']'
-	| '[' '*' ']'
-	| '[' STATIC type_qualifier_list assignment_expression ']'
-	| '[' STATIC assignment_expression ']'
-	| '[' type_qualifier_list STATIC assignment_expression ']'
-	| '[' type_qualifier_list assignment_expression ']'
-	| '[' type_qualifier_list ']'
-	| '[' assignment_expression ']'
-	| direct_abstract_declarator '[' ']'
-	| direct_abstract_declarator '[' '*' ']'
-	| direct_abstract_declarator '[' STATIC type_qualifier_list assignment_expression ']'
-	| direct_abstract_declarator '[' STATIC assignment_expression ']'
-	| direct_abstract_declarator '[' type_qualifier_list assignment_expression ']'
-	| direct_abstract_declarator '[' type_qualifier_list STATIC assignment_expression ']'
-	| direct_abstract_declarator '[' type_qualifier_list ']'
-	| direct_abstract_declarator '[' assignment_expression ']'
-	| '(' ')'
-	| '(' parameter_type_list ')'
-	| direct_abstract_declarator '(' ')'
-	| direct_abstract_declarator '(' parameter_type_list ')'
+	: LPAREN abstract_declarator RPAREN
+	| LSQBRACKET RSQBRACKET
+	| LSQBRACKET MUL RSQBRACKET
+	| LSQBRACKET STATIC type_qualifier_list assignment_expression RSQBRACKET
+	| LSQBRACKET STATIC assignment_expression RSQBRACKET
+	| LSQBRACKET type_qualifier_list STATIC assignment_expression RSQBRACKET
+	| LSQBRACKET type_qualifier_list assignment_expression RSQBRACKET
+	| LSQBRACKET type_qualifier_list RSQBRACKET
+	| LSQBRACKET assignment_expression RSQBRACKET
+	| direct_abstract_declarator LSQBRACKET RSQBRACKET
+	| direct_abstract_declarator LSQBRACKET MUL RSQBRACKET
+	| direct_abstract_declarator LSQBRACKET STATIC type_qualifier_list assignment_expression RSQBRACKET
+	| direct_abstract_declarator LSQBRACKET STATIC assignment_expression RSQBRACKET
+	| direct_abstract_declarator LSQBRACKET type_qualifier_list assignment_expression RSQBRACKET
+	| direct_abstract_declarator LSQBRACKET type_qualifier_list STATIC assignment_expression RSQBRACKET
+	| direct_abstract_declarator LSQBRACKET type_qualifier_list RSQBRACKET
+	| direct_abstract_declarator LSQBRACKET assignment_expression RSQBRACKET
+	| LPAREN RPAREN
+	| LPAREN parameter_type_list RPAREN
+	| direct_abstract_declarator LPAREN RPAREN
+	| direct_abstract_declarator LPAREN parameter_type_list RPAREN
 	;
 
 initializer
-	: '{' initializer_list '}'
-	| '{' initializer_list ',' '}'
+	: LBRACKET initializer_list RBRACKET
+	| LBRACKET initializer_list COMMA RBRACKET
 	| assignment_expression
 	;
 
 initializer_list
 	: designation initializer
 	| initializer
-	| initializer_list ',' designation initializer
-	| initializer_list ',' initializer
+	| initializer_list COMMA designation initializer
+	| initializer_list COMMA initializer
 	;
 
 designation
-	: designator_list '='
+	: designator_list EQU
 	;
 
 designator_list
@@ -447,12 +447,12 @@ designator_list
 	;
 
 designator
-	: '[' constant_expression ']'
-	| '.' IDENTIFIER
+	: LSQBRACKET constant_expression RSQBRACKET
+	| POINT ID
 	;
 
 static_assert_declaration
-	: "_Static_assert" '(' constant_expression ',' STRING_LITERAL ')' ';'
+	: STATIC_ASSERT LPAREN constant_expression COMMA STRING_LITERAL RPAREN SEMICOLON
 	;
 
 statement
@@ -465,14 +465,14 @@ statement
 	;
 
 labeled_statement
-	: IDENTIFIER ':' statement
-	| CASE constant_expression ':' statement
-	| DEFAULT ':' statement
+	: ID COLON statement
+	| CASE constant_expression COLON statement
+	| DEFAULT COLON statement
 	;
 
 compound_statement
-	: '{' '}'
-	| '{'  block_item_list '}'
+	: LBRACKET RBRACKET
+	| LBRACKET  block_item_list RBRACKET
 	;
 
 block_item_list
@@ -486,31 +486,31 @@ block_item
 	;
 
 expression_statement
-	: ';'
-	| expression ';'
+	: SEMICOLON
+	| expression SEMICOLON
 	;
 
 selection_statement
-	: IF '(' expression ')' statement ELSE statement
-	| IF '(' expression ')' statement
-	| SWITCH '(' expression ')' statement
+	: IF LPAREN expression RPAREN statement ELSE statement
+	| IF LPAREN expression RPAREN statement
+	| SWITCH LPAREN expression RPAREN statement
 	;
 
 iteration_statement
-	: WHILE '(' expression ')' statement
-	| DO statement WHILE '(' expression ')' ';'
-	| FOR '(' expression_statement expression_statement ')' statement
-	| FOR '(' expression_statement expression_statement expression ')' statement
-	| FOR '(' declaration expression_statement ')' statement
-	| FOR '(' declaration expression_statement expression ')' statement
+	: WHILE LPAREN expression RPAREN statement
+	| DO statement WHILE LPAREN expression RPAREN SEMICOLON
+	| FOR LPAREN expression_statement expression_statement RPAREN statement
+	| FOR LPAREN expression_statement expression_statement expression RPAREN statement
+	| FOR LPAREN declaration expression_statement RPAREN statement
+	| FOR LPAREN declaration expression_statement expression RPAREN statement
 	;
 
 jump_statement
-	: GOTO IDENTIFIER ';'
-	| CONTINUE ';'
-	| BREAK ';'
-	| RETURN ';'
-	| RETURN expression ';'
+	: GOTO ID SEMICOLON
+	| CONTINUE SEMICOLON
+	| BREAK SEMICOLON
+	| RETURN SEMICOLON
+	| RETURN expression SEMICOLON
 	;
 
 translation_unit

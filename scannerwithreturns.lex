@@ -59,118 +59,112 @@ extern {
     return(EXTERN);
 }
 double {
-    fprintf(tokensTemp, "%s 53\n", yytext);
     return(DOUBLE);
 }
 float {
-    fprintf(tokensTemp, "%s 54\n", yytext);
     return(FLOAT);
 }
 for {
-    fprintf(tokensTemp, "%s 55\n", yytext);
     return(FOR);
 }
 goto {
-    fprintf(tokensTemp, "%s 56\n", yytext);
     return(GOTO);
 }
 if {
-    fprintf(tokensTemp, "%s 57\n", yytext);
     return(IF);
 }
 int {
-    fprintf(tokensTemp, "%s 58\n", yytext);
     return(INT);
 }
 long {
-    fprintf(tokensTemp, "%s 59\n", yytext);
     return(LONG);
 }
 register {
-    fprintf(tokensTemp, "%s 60\n", yytext);
     return(REGISTER);
 }
 return {
-    fprintf(tokensTemp, "%s 61\n", yytext);
     return(RETURN);
 }
 short {
-    fprintf(tokensTemp, "%s 62\n", yytext);
     return(SHORT);
 }
 signed {
-    fprintf(tokensTemp, "%s 63\n", yytext);
     return(SIGNED);
 }
 sizeof {
-    fprintf(tokensTemp, "%s 64\n", yytext);
     return(SIZEOF);
 }
 static {
-    fprintf(tokensTemp, "%s 65\n", yytext);
     return(STATIC);
 }
 struct {
-    fprintf(tokensTemp, "%s 66\n", yytext);
     return(STRUCT);
 }
 switch {
-    fprintf(tokensTemp, "%s 67\n", yytext);
     return(SWITCH);
 }
 typedef {
-    fprintf(tokensTemp, "%s 68\n", yytext);
     return(TYPEDEF);
 }
 union {
-    fprintf(tokensTemp, "%s 69\n", yytext);
     return(UNION);
 }
 unsigned {
-    fprintf(tokensTemp, "%s 70\n", yytext);
     return(UNSIGNED);
 }
 void {
-    fprintf(tokensTemp, "%s 71\n", yytext);
     return(VOID);
 }
 volatile {
-    fprintf(tokensTemp, "%s 72\n", yytext);
     return(VOLATILE);
 }
 while {
-    fprintf(tokensTemp, "%s 73\n", yytext);
     return(WHILE);
 }
 
+inline {
+    return(INLINE)
+}
+
+"_Alignas"                              { return(ALIGNAS); }
+"_Alignof"                              { return(ALIGNOF); }
+"_Atomic"                               { return(ATOMIC); }
+"_Bool"                                 { return(BOOL); }
+"_Complex"                              { return(COMPLEX); }
+"_Generic"                              { return(GENERIC); }
+"_Imaginary"                            { return(IMAGINARY); }
+"_Noreturn"                             { return(NORETURN); }
+"_Static_assert"                        { return(STATIC_ASSERT); }
+"_Thread_local"                         { return(THREAD_LOCAL); }
+"__func__"                              { return(FUNC_NAME); }
+
 {STRINGLITERAL} {
-    fprintf(tokensTemp, "%s 41\n", yytext);
     return(STRINGLITERAL);
 }
 
 "+" {
     fprintf(tokensTemp, "%s 0\n", yytext);
-    return('+');
+    return(ADD);
 }
 
 "-" {
     fprintf(tokensTemp, "%s 1\n", yytext);
-    return('-');
+    return(SUB);
 }
 
 "*" {
     fprintf(tokensTemp, "%s 2\n", yytext);
-    return('*');
+    return(MUL);
 }
 
 "/" {
     fprintf(tokensTemp, "%s 3\n", yytext);
-    return('/');
+    return(DIV);
 }
 
 "=" {
     fprintf(tokensTemp, "%s 4\n", yytext);
-    return('=');
+    return(EQU);
 }
 
 "+=" {
@@ -195,7 +189,7 @@ while {
 
 "%" {
     fprintf(tokensTemp, "%s 9\n", yytext);
-    return('%');
+    return(MOD);
 }
 
 "%=" {
@@ -215,12 +209,12 @@ while {
 
 "<" {
     fprintf(tokensTemp, "%s 13\n", yytext);
-    return('<');
+    return(L_THAN);
 }
 
 ">" {
     fprintf(tokensTemp, "%s 14\n", yytext);
-    return('>');
+    return(G_THAN);
 }
 
 "<=" {
@@ -245,7 +239,7 @@ while {
 
 "!" {
     fprintf(tokensTemp, "%s 19\n", yytext);
-    return('!');
+    return(NOT);
 }
 
 "&&" {
@@ -280,12 +274,12 @@ while {
 
 "~" {
     fprintf(tokensTemp, "%s 26\n", yytext);
-    return('~');
+    return(TILDE);
 }
 
 "&" {
     fprintf(tokensTemp, "%s 27\n", yytext);
-    return('&');
+    return(AND);
 }
 
 "&=" {
@@ -295,7 +289,7 @@ while {
 
 "|" {
     fprintf(tokensTemp, "%s 29\n", yytext);
-    return('|');
+    return(OR);
 }
 
 "|=" {
@@ -305,7 +299,7 @@ while {
 
 "^" {
     fprintf(tokensTemp, "%s 31\n", yytext);
-    return('^');
+    return(XOR);
 }
 
 "^=" {
@@ -320,17 +314,17 @@ while {
 
 "." {
     fprintf(tokensTemp, "%s 34\n", yytext);
-    return('.');
+    return(POINT);
 }
 
 "?" {
     fprintf(tokensTemp, "%s 35\n", yytext);
-    return('?');
+    return(QUESTION);
 }
 
 ":" {
     fprintf(tokensTemp, "%s 36\n", yytext);
-    return(':');
+    return(COLON);
 }
 
 {NEWLINE} {
@@ -345,7 +339,7 @@ while {
 
 {RPAREN} {
     fprintf(tokensTemp, "%s 75\n", yytext);
-    return(LPAREN);
+    return(RPAREN);
     
 }
 
@@ -371,7 +365,7 @@ while {
 
 {COMMA} {
     fprintf(tokensTemp, "%s 80\n", yytext);
-    return(LPAREN);
+    return(COMMA);
 }
 
 {SEMICOLON} {
