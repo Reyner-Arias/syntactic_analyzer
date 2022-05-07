@@ -2,14 +2,19 @@
 #include <string.h>
 #include "preprocessing.c"
 
-int main()
+int main(int argc, char *argv[])
 {
     newArray ancestorsDef;
     ancestorsDef.index = 0;
-    printf("Welcome to the lexical analyzer, please type the name of the file that you want to analyze:\n");
-    string fileName = {};
-    scanf("%s", fileName);
+    printf("Welcome to the syntactic analyzer\n");
+    if (argc != 2)
+    {
+        printf("Argumento inválido\n");
+        exit(1);
+    }
+    printf("%s\n", argv[1]);
+    scanf("%s", argv[1]);
     remove("cTemp.c");
-    preprocessing(fileName, ancestorsDef);
+    preprocessing(argv[1], ancestorsDef);
     remove("interTemp.c");
 }
