@@ -20,7 +20,7 @@ DOUBLELITERAL ({FLOATLITERAL}+"e"{INTLITERAL})
 HEXLITERAL 0x({INTLITERAL}|([A-F]|[a-f]))
 HEXLITERALFLOAT HEXLITERAL+"."({INTLITERAL}|([A-F]|[a-f]))"p""-"?{INTLITERAL}
 CHARLITERAL \'(\\.|[^"\\])\'
-STRINGLITERAL \"(\\.|[^"\\])*\"
+STRINGLITERAL ({(u8|u|U|L)}?"([^"\\n]|{(\(['"?\abfnrtv]|[0-7]{1,3}|x[a-fA-F0-9]+))})"{[ \t\v\n\f]})+
 INVALIDSUFFIX [0-9]([a-z]|[A-Z]|_|[0-9])*
 
 /*Rules*/
