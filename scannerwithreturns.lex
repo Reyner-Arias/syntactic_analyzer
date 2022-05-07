@@ -26,47 +26,36 @@ INVALIDSUFFIX [0-9]([a-z]|[A-Z]|_|[0-9])*
 /*Rules*/
 %%
 auto {
-    fprintf(tokensTemp, "%s 42\n", yytext);
     return(AUTO);
 }
 break {
-    fprintf(tokensTemp, "%s 43\n", yytext);
     return(BREAK);
 }
 case {
-    fprintf(tokensTemp, "%s 44\n", yytext);
     return(CASE);
 }
 char {
-    fprintf(tokensTemp, "%s 45\n", yytext);
     return(CHAR);
 }
 const {
-    fprintf(tokensTemp, "%s 46\n", yytext);
     return(CONST);
 }
 continue {
-    fprintf(tokensTemp, "%s 47\n", yytext);
     return(CONTINUE);
 }
 default {
-    fprintf(tokensTemp, "%s 48\n", yytext);
     return(DEFAULT);
 }
 do {
-    fprintf(tokensTemp, "%s 49\n", yytext);
     return(DO);
 }
 else {
-    fprintf(tokensTemp, "%s 50\n", yytext);
     return(ELSE);
 }
 enum {
-    fprintf(tokensTemp, "%s 51\n", yytext);
     return(ENUM);
 }
 extern {
-    fprintf(tokensTemp, "%s 52\n", yytext);
     return(EXTERN);
 }
 double {

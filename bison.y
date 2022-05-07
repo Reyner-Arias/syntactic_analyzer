@@ -14,6 +14,18 @@
 %token VOID CHAR SHORT INT LONG FLOAT DOUBLE SIGNED UNSIGNED BOOL COMPLEX IMAGINARY TYPEDEF_NAME STRUCT UNION
 %token ENUM CONST RESTRICT VOLATILE ATOMIC CASE IF SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
+
+%union{
+	char* idvalue
+	int intvalue;
+	float floatvalue;
+	double doublevalue;
+	int hexvalue;
+	double hexfloatvalue;
+	char charvalue;
+	char+ stringvalue;
+}
+
 %%
 primary_expression
     : ID 
