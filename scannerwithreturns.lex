@@ -139,272 +139,230 @@ inline {
 "__func__"                              { return(FUNC_NAME); }
 
 {STRINGLITERAL} {
+    sscanf(yytext, "%s", yylval.stringvalue);
     return(STRINGLITERAL);
 }
 
 "+" {
-    fprintf(tokensTemp, "%s 0\n", yytext);
     return(ADD);
 }
 
 "-" {
-    fprintf(tokensTemp, "%s 1\n", yytext);
     return(SUB);
 }
 
 "*" {
-    fprintf(tokensTemp, "%s 2\n", yytext);
     return(MUL);
 }
 
 "/" {
-    fprintf(tokensTemp, "%s 3\n", yytext);
     return(DIV);
 }
 
 "=" {
-    fprintf(tokensTemp, "%s 4\n", yytext);
     return(EQU);
 }
 
 "+=" {
-    fprintf(tokensTemp, "%s 5\n", yytext);
     return(ADD_ASSIGN);
 }
 
 "-=" {
-    fprintf(tokensTemp, "%s 6\n", yytext);
     return(SUB_ASSIGN);
 }
 
 "*=" {
-    fprintf(tokensTemp, "%s 7\n", yytext);
     return(MUL_ASSIGN);
 }
 
 "/=" {
-    fprintf(tokensTemp, "%s 8\n", yytext);
     return(DIV_ASSIGN);
 }
 
 "%" {
-    fprintf(tokensTemp, "%s 9\n", yytext);
     return(MOD);
 }
 
 "%=" {
-    fprintf(tokensTemp, "%s 10\n", yytext);
     return(MOD_ASSIGN);
 }
 
 "++" {
-    fprintf(tokensTemp, "%s 11\n", yytext);
     return(INC_OP);
 }
 
 "--" {
-    fprintf(tokensTemp, "%s 12\n", yytext);
     return(DEC_OP);
 }
 
 "<" {
-    fprintf(tokensTemp, "%s 13\n", yytext);
     return(L_THAN);
 }
 
 ">" {
-    fprintf(tokensTemp, "%s 14\n", yytext);
     return(G_THAN);
 }
 
 "<=" {
-    fprintf(tokensTemp, "%s 15\n", yytext);
     return(LE_OP);
 }
 
 ">=" {
-    fprintf(tokensTemp, "%s 16\n", yytext);
     return(GE_OP);
 }
 
 "==" {
-    fprintf(tokensTemp, "%s 17\n", yytext);
     return(EQ_OP);
 }
 
 "!=" {
-    fprintf(tokensTemp, "%s 18\n", yytext);
     return(NE_OP);
 }
 
 "!" {
-    fprintf(tokensTemp, "%s 19\n", yytext);
     return(NOT);
 }
 
 "&&" {
-    fprintf(tokensTemp, "%s 20\n", yytext);
     return(AND_OP);
 }
 
 "||" {
-    fprintf(tokensTemp, "%s 21\n", yytext);
     return(OR_OP);
 }
 
 "<<" {
-    fprintf(tokensTemp, "%s 22\n", yytext);
     return(LEFT_OP);
 }
 
 "<<=" {
-    fprintf(tokensTemp, "%s 23\n", yytext);
     return(LEFT_ASSIGN);
 }
 
 ">>" {
-    fprintf(tokensTemp, "%s 24\n", yytext);
     return(RIGHT_OP);
 }
 
 ">>=" {
-    fprintf(tokensTemp, "%s 25\n", yytext);
     return(RIGHT_ASSIGN);
 }
 
 "~" {
-    fprintf(tokensTemp, "%s 26\n", yytext);
     return(TILDE);
 }
 
 "&" {
-    fprintf(tokensTemp, "%s 27\n", yytext);
     return(AND);
 }
 
 "&=" {
-    fprintf(tokensTemp, "%s 28\n", yytext);
     return(AND_ASSIGN);
 }
 
 "|" {
-    fprintf(tokensTemp, "%s 29\n", yytext);
     return(OR);
 }
 
 "|=" {
-    fprintf(tokensTemp, "%s 30\n", yytext);
     return(OR_ASSIGN);
 }
 
 "^" {
-    fprintf(tokensTemp, "%s 31\n", yytext);
     return(XOR);
 }
 
 "^=" {
-    fprintf(tokensTemp, "%s 32\n", yytext);
     return(XOR_ASSIGN);
 }
 
 "->" {
-    fprintf(tokensTemp, "%s 33\n", yytext);
     return(PTR_OP);
 }
 
 "." {
-    fprintf(tokensTemp, "%s 34\n", yytext);
     return(POINT);
 }
 
 "?" {
-    fprintf(tokensTemp, "%s 35\n", yytext);
     return(QUESTION);
 }
 
 ":" {
-    fprintf(tokensTemp, "%s 36\n", yytext);
     return(COLON);
 }
 
 {NEWLINE} {
-    fprintf(tokensTemp, "%s", yytext);
     return();***************************************************************************
 }
 
 {LPAREN} {
-    fprintf(tokensTemp, "%s 74\n", yytext);
     return(LPAREN);
 }
 
 {RPAREN} {
-    fprintf(tokensTemp, "%s 75\n", yytext);
-    return(RPAREN);
-    
+    return(RPAREN);    
 }
 
 {LSQBRACKET} {
-    fprintf(tokensTemp, "%s 76\n", yytext);
     return(LSQBRACKET)
 }
 
 {RSQBRACKET} {
-    fprintf(tokensTemp, "%s 77\n", yytext);
     return(RSQBRACKET);
 }
 
 {LBRACKET} {
-    fprintf(tokensTemp, "%s 78\n", yytext);
     return(LBRACKET);    
 }
 
 {RBRACKET} {
-    fprintf(tokensTemp, "%s 79\n", yytext);
     return(RBRACKET);
 }
 
 {COMMA} {
-    fprintf(tokensTemp, "%s 80\n", yytext);
     return(COMMA);
 }
 
 {SEMICOLON} {
-    fprintf(tokensTemp, "%s 81\n", yytext);
     return(SEMICOLON);    
 }
 
 {ID} {
-    fprintf(tokensTemp, "%s 82\n", yytext);
+    sscanf(yytext, "%s", yylval.idvalue);
     return(ID);    
 }
 
 {HEXLITERALFLOAT} {
-    fprintf(tokensTemp, "%s 39\n", yytext);
+    sscanf(yytext, "%s", yylval.hexfloatvalue);
     return(HEXLITERALFLOAT);*********************************************************
 }
 
 {HEXLITERAL}|{INTLITERAL} {
-    fprintf(tokensTemp, "%s 37\n", yytext);
+    sscanf(yytext, "%s", yylval.hexvalue);
     return();********************************************************    
 }
 
 {FLOATLITERAL} {
-    fprintf(tokensTemp, "%s 38\n", yytext);
+    sscanf(yytext, "%s", yylval.floatvalue);
     return(FLOATLITERAL);    
 }
 
 {DOUBLELITERAL} {
-    fprintf(tokensTemp, "%s 39\n", yytext);
+    sscanf(yytext, "%s", yylval.doublevalue);
     return(DOUBLELITERAL);*******************************************
 }
 
 {CHARLITERAL} {
-    fprintf(tokensTemp, "%s 40\n", yytext);
+    sscanf(yytext, "%s", yylval.charvalue);
     return(CHARLITERAL);**********************************************
 }
 
+{INTLITERAL} {
+    sscanf(yytext, "%s", yylval.intvalue);
+    return(INTLITERAL);
+}
+
 {INVALIDSUFFIX} {
-    fprintf(tokensTemp, "%s 83\n", yytext);
     return(INVALIDSUFFIX);**************************************************
 }
 

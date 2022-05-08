@@ -14,6 +14,14 @@
 %token VOID CHAR SHORT INT LONG FLOAT DOUBLE SIGNED UNSIGNED BOOL COMPLEX IMAGINARY TYPEDEF_NAME STRUCT UNION
 %token ENUM CONST RESTRICT VOLATILE ATOMIC CASE IF SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
+%type <idvalue> ID
+%type <intvalue> INTLITERAL
+%type <floatvalue> FLOATLITERAL
+%type <doublevalue> DOUBLELITERAL
+%type <hexvalue> HEXLITERAL
+%type <hexfloatvalue> HEXLITERALFLOAT
+%type <charvalue> CHARLITERAL
+%type <stringvalue> STRINGLITERAL 
 
 %union{
 	char* idvalue
@@ -452,7 +460,7 @@ designator
 	;
 
 static_assert_declaration
-	: STATIC_ASSERT LPAREN constant_expression COMMA STRING_LITERAL RPAREN SEMICOLON
+	: STATIC_ASSERT LPAREN constant_expression COMMA STRINGLITERAL RPAREN SEMICOLON
 	;
 
 statement
