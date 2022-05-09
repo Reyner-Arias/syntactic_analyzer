@@ -91,9 +91,7 @@ newArray preprocessing(string pfileName, newArray ancestorsDef){
     localDef.index = 0;
     acumulatedDef.index = 0;
     int in_char, c;
-
-    concatArray(&localDef, &ancestorsDef);
-
+    
     //Remove comments to simplify the code
     FILE *inFile = fopen(fileName, "r");
     if (inFile == NULL)
@@ -165,28 +163,27 @@ newArray preprocessing(string pfileName, newArray ancestorsDef){
                 line_buffer_char(c);
             }
             ungetc(c, file);
-            /*if (!strcmp(buffer, "include"))
+            if (!strcmp(buffer, "include"))
             {
+                int angular = 0;
+                int quotes = 0;
+
                 clear_buffer();
                 for(c = getc(file); c != '<' && c != '\"' && c != '\n' && c != EOF; c = getc(file)){
                     line_buffer_char(c);
                 }
                 if(c == '<'){
-                    for (c = getc(file); quotes < 2 && angular != 2; c = getc(file)){
+                    angular = 1;
+                    for (c = getc(file); angular < 2; c = getc(file)){
                         line_buffer_char(c);
-                        if (c == '\"' && angular == 0)
-                        {   
-                            quotes++;
-                        } else if (c == '<' && quotes == 0){
-                            angular = 1;
-                        } else if (c == '>' && angular == 1 && quotes == 0){
+                        if (c == '>'){
                             angular = 2;
                         } else if (c == '\n')
                         {
-                            printf("Warning: There are not enough quotes in the #include directive\n");
+                            printf("Warning: There is no left angular bracket in the #include directive\n");
                             fprintf(tmp, "%s", line_buffer);
                             clear_line_buffer();
-                            continue;
+                            angular = 3;
                         } else if (c == '/' || c == 0)
                         {
                             printf("Warning: Invalid character in a file\n");
@@ -194,17 +191,13 @@ newArray preprocessing(string pfileName, newArray ancestorsDef){
                             line_buffer[line_buffer_index-1] = 0;
                             line_buffer_index--;
                             fprintf(tmp, "%s", line_buffer);
-                            continue;
-                        } else if (quotes >= 1 || angular == 1)
+                            angular = 3;
+                        } else
                         {
                             buffer_char(c);
-                        } else if (!isspace(c))
-                        {
-                            printf("Warning: Expected filename\n");
-                            fprintf(tmp, "%s", line_buffer);
-                            continue;
-                        }
+                        } 
                     }
+                    if (angular == 3) continue;
                     if (buffer_index == 0)
                     {
                         printf("Warning: Expected filename\n");
@@ -212,18 +205,27 @@ newArray preprocessing(string pfileName, newArray ancestorsDef){
                         continue;
                     }
                     if(!isInclude(buffer, ancestors, ancestorsIndex)){
-                        acumulatedDef = preprocessing(buffer, localDef);
-                        concatArray(&acumulatedDef, &localDef);
+                        newArray nextAncestorsDef, tmpDef;
+                        nextAncestorsDef.index = 0;
+                        concatArray(&nextAncestorsDef, &ancestorsDef);
+                        concatArray(&nextAncestorsDef, &localDef);
+                        tmpDef = preprocessing(buffer, nextAncestorsDef);
+                        concatArray(&acumulatedDef, &tmpDef);
                     } else {
-                        printf("There is a cycle in the include directives\n");
+                        printf("Warning: There is a cycle in the include directives\n");
+                        fprintf(tmp, "%s", line_buffer);
                         continue;
                     }
                 } else if(c == '\"'){
-
+                    
+                } else {
+                    fprintf(tmp, "%s", line_buffer);
                 }
-            } */
+            } 
         }
     }
 
     remove(tempfile);
+    concatArray(&acumulatedDef, &localDef);
+    return acumulatedDef;
 }
