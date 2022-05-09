@@ -31,7 +31,7 @@
 	int hexvalue;
 	double hexfloatvalue;
 	char charvalue;
-	char+ stringvalue;
+	char* stringvalue;
 }
 
 %%

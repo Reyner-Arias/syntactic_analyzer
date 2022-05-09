@@ -1,6 +1,7 @@
 /*Definitions*/
 %{
     #include <stdio.h>
+    #include "bison.tab.h"
     FILE* tokensTemp;
 %}
 %option noyywrap
@@ -123,7 +124,7 @@ while {
 }
 
 inline {
-    return(INLINE)
+    return(INLINE);
 }
 
 "_Alignas"                              { return(ALIGNAS); }
@@ -144,7 +145,7 @@ inline {
 }
 
 "..." {
-    return(ELLIPSIS)
+    return(ELLIPSIS);
 }
 
 "+" {
@@ -296,7 +297,7 @@ inline {
 }
 
 {NEWLINE} {
-    return();***************************************************************************
+    return(NEWLINE);
 }
 
 {LPAREN} {
@@ -308,7 +309,7 @@ inline {
 }
 
 {LSQBRACKET} {
-    return(LSQBRACKET)
+    return(LSQBRACKET);
 }
 
 {RSQBRACKET} {
@@ -338,12 +339,12 @@ inline {
 
 {HEXLITERALFLOAT} {
     sscanf(yytext, "%s", yylval.hexfloatvalue);
-    return(HEXLITERALFLOAT);*********************************************************
+    return(HEXLITERALFLOAT);
 }
 
 {HEXLITERAL}|{INTLITERAL} {
     sscanf(yytext, "%s", yylval.hexvalue);
-    return();********************************************************    
+    return(HEXLITERAL);
 }
 
 {FLOATLITERAL} {
@@ -353,12 +354,12 @@ inline {
 
 {DOUBLELITERAL} {
     sscanf(yytext, "%s", yylval.doublevalue);
-    return(DOUBLELITERAL);*******************************************
+    return(DOUBLELITERAL);
 }
 
 {CHARLITERAL} {
     sscanf(yytext, "%s", yylval.charvalue);
-    return(CHARLITERAL);**********************************************
+    return(CHARLITERAL);
 }
 
 {INTLITERAL} {
@@ -367,7 +368,7 @@ inline {
 }
 
 {INVALIDSUFFIX} {
-    return(INVALIDSUFFIX);**************************************************
+    return(INVALIDSUFFIX);
 }
 
 [ \t]+ /* eat up whitespace */

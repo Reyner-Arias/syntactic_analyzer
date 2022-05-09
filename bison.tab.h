@@ -164,7 +164,7 @@ union YYSTYPE
 	int hexvalue;
 	double hexfloatvalue;
 	char charvalue;
-	char+ stringvalue;
+	char* stringvalue;
 
 #line 170 "bison.tab.h" /* yacc.c:1909  */
 };

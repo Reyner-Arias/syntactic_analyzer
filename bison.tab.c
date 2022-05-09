@@ -222,7 +222,7 @@ union YYSTYPE
 	int hexvalue;
 	double hexfloatvalue;
 	char charvalue;
-	char+ stringvalue;
+	char* stringvalue;
 
 #line 228 "bison.tab.c" /* yacc.c:355  */
 };
