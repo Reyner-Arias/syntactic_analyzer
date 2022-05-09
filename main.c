@@ -12,8 +12,7 @@ int main(int argc, char *argv[])
         printf("Argumento inválido\n para hacer funcionar este programa debe ingresar:\n ./main nombreArchivo");
         exit(1);
     }
-    printf("%s\n", argv[1]);
-    scanf("%s", argv[1]);
+    
     remove("cTemp.c");
     preprocessing(argv[1], ancestorsDef);
     remove("interTemp.c");

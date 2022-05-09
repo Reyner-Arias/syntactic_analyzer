@@ -76,7 +76,7 @@ void concatArray(newArray* original, newArray* extension){
     }
 }
 
-newArray preprocessing(string pfileName, newArray ancestorsDef){
+newArray preprocessing(char* pfileName, newArray ancestorsDef){
     newArray localDef, acumulatedDef;
     
     string fileName;
