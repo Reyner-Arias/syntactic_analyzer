@@ -143,6 +143,10 @@ inline {
     return(STRINGLITERAL);
 }
 
+"..." {
+    return(ELLIPSIS)
+}
+
 "+" {
     return(ADD);
 }

@@ -5,7 +5,7 @@
 %}
 
 %token LPAREN RPAREN LSQBRACKET RSQBRACKET LBRACKET RBRACKET
-%token SEMICOLON COMMA NEWLINE COLON POINT
+%token SEMICOLON COMMA NEWLINE COLON POINT ALIGNAS ALIGNOF ELLIPSIS ELSE EQU GENERIC INLINE
 %token ID INTLITERAL FLOATLITERAL DOUBLELITERAL HEXLITERAL HEXLITERALFLOAT CHARLITERAL STRINGLITERAL
 %token INVALIDSUFFIX AND MUL ADD SUB TILDE NOT DIV MOD L_THAN G_THAN XOR OR QUESTION
 %token SIZEOF INC_OP DEC_OP PTR_OP DEFAULT LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP AND_OP OR_OP
@@ -24,7 +24,7 @@
 %type <stringvalue> STRINGLITERAL 
 
 %union{
-	char* idvalue
+	char* idvalue;
 	int intvalue;
 	float floatvalue;
 	double doublevalue;
@@ -38,7 +38,7 @@
 primary_expression
     : ID 
     | constant 
-    | STRINGLITERAL 
+    | string 
     | LPAREN expression RPAREN 
     | generic_selection
     ;
@@ -135,7 +135,7 @@ shift_expression
 
 relational_expression
 	: shift_expression
-	| relational_expression l_THAN shift_expression
+	| relational_expression L_THAN shift_expression
 	| relational_expression G_THAN shift_expression
 	| relational_expression LE_OP shift_expression
 	| relational_expression GE_OP shift_expression
