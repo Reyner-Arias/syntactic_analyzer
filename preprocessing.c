@@ -97,7 +97,7 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
     if (inFile == NULL)
     {
         printf("Error! Could not open file\n");
-        exit(-1);
+        return acumulatedDef;
     }
     char tempfile[12];
     sprintf(tempfile, "wComm%d.c", fileCounter);
@@ -153,15 +153,17 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
     while ((in_char = getc(file)) != EOF){
         if(in_char == '\n' || in_char == EOF){
             clear_line_buffer();
+            fprintf(tmp, "%s", line_buffer);
         } else {
             line_buffer_char(in_char);
         }
-        if (in_char == '#'){
+        /*if (in_char == '#'){
             clear_buffer();
-            for (c = getc(file); isalpha(c); c = getc(file)){
+            for (c = getc(file); isalpha(c) || isspace(c); c = getc(file)){
                 buffer_char(c);
                 line_buffer_char(c);
             }
+            printf("%s\n", line_buffer);
             ungetc(c, file);
             if (!strcmp(buffer, "include"))
             {
@@ -174,6 +176,7 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                     //Buscar defines actuales
                 }
                 if(c == '<'){
+                    line_buffer_char(c);
                     angular = 1;
                     for (c = getc(file); angular < 2; c = getc(file)){
                         line_buffer_char(c);
@@ -185,7 +188,7 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                             fprintf(tmp, "%s", line_buffer);
                             clear_line_buffer();
                             angular = 3;
-                        } else if (c == '/' || c == 0)
+                        } else if (c == 0)
                         {
                             printf("Warning: Invalid character in a file\n");
                             ungetc(c, file);
@@ -198,6 +201,7 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                             buffer_char(c);
                         } 
                     }
+                    ungetc(c, file);
                     if (angular == 3) continue;
                     if (buffer_index == 0)
                     {
@@ -222,6 +226,7 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                         continue;
                     }
                 } else if(c == '\"'){
+                    line_buffer_char(c);
                     quotes = 1;
                     for (c = getc(file); quotes < 2; c = getc(file)){
                         line_buffer_char(c);
@@ -233,7 +238,7 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                             fprintf(tmp, "%s", line_buffer);
                             clear_line_buffer();
                             quotes = 3;
-                        } else if (c == '/' || c == 0)
+                        } else if (c == 0)
                         {
                             printf("Warning: Invalid character in a file\n");
                             ungetc(c, file);
@@ -270,7 +275,7 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                     //Buscar defines
                 }
             } 
-        }
+        }*/
     }
 
     remove(tempfile);
