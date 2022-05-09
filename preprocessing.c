@@ -77,7 +77,7 @@ void concatArray(newArray* original, newArray* extension){
 }
 
 newArray preprocessing(string pfileName, newArray ancestorsDef){
-    newArray localDef, ancestorsDef, acumulatedDef;
+    newArray localDef, acumulatedDef;
     
     string fileName;
     strcpy(fileName, pfileName);
@@ -171,6 +171,7 @@ newArray preprocessing(string pfileName, newArray ancestorsDef){
                 clear_buffer();
                 for(c = getc(file); c != '<' && c != '\"' && c != '\n' && c != EOF; c = getc(file)){
                     line_buffer_char(c);
+                    //Buscar defines actuales
                 }
                 if(c == '<'){
                     angular = 1;
@@ -206,6 +207,54 @@ newArray preprocessing(string pfileName, newArray ancestorsDef){
                     }
                     if(!isInclude(buffer, ancestors, ancestorsIndex)){
                         newArray nextAncestorsDef, tmpDef;
+                        char lFilename[600];
+
+                        sprintf(lFilename, "/usr/include/%s", buffer);
+                        nextAncestorsDef.index = 0;
+                        concatArray(&nextAncestorsDef, &ancestorsDef);
+                        concatArray(&nextAncestorsDef, &localDef);
+
+                        tmpDef = preprocessing(lFilename, nextAncestorsDef);
+                        concatArray(&acumulatedDef, &tmpDef);
+                    } else {
+                        printf("Warning: There is a cycle in the include directives\n");
+                        fprintf(tmp, "%s", line_buffer);
+                        continue;
+                    }
+                } else if(c == '\"'){
+                    quotes = 1;
+                    for (c = getc(file); quotes < 2; c = getc(file)){
+                        line_buffer_char(c);
+                        if (c == '\"'){
+                            quotes = 2;
+                        } else if (c == '\n')
+                        {
+                            printf("Warning: There is no left angular bracket in the #include directive\n");
+                            fprintf(tmp, "%s", line_buffer);
+                            clear_line_buffer();
+                            quotes = 3;
+                        } else if (c == '/' || c == 0)
+                        {
+                            printf("Warning: Invalid character in a file\n");
+                            ungetc(c, file);
+                            line_buffer[line_buffer_index-1] = 0;
+                            line_buffer_index--;
+                            fprintf(tmp, "%s", line_buffer);
+                            quotes = 3;
+                        } else
+                        {
+                            buffer_char(c);
+                        } 
+                    }
+                    if (quotes == 3) continue;
+                    if (buffer_index == 0)
+                    {
+                        printf("Warning: Expected filename\n");
+                        fprintf(tmp, "%s", line_buffer);
+                        continue;
+                    }
+                    if(!isInclude(buffer, ancestors, ancestorsIndex)){
+                        newArray nextAncestorsDef, tmpDef;
                         nextAncestorsDef.index = 0;
                         concatArray(&nextAncestorsDef, &ancestorsDef);
                         concatArray(&nextAncestorsDef, &localDef);
@@ -216,10 +265,9 @@ newArray preprocessing(string pfileName, newArray ancestorsDef){
                         fprintf(tmp, "%s", line_buffer);
                         continue;
                     }
-                } else if(c == '\"'){
-                    
                 } else {
                     fprintf(tmp, "%s", line_buffer);
+                    //Buscar defines
                 }
             } 
         }
