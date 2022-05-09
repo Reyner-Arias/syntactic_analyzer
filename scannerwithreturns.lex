@@ -1,6 +1,7 @@
 /*Definitions*/
 %{
     #include <stdio.h>
+    #include "bison.tab.h"
     FILE* tokensTemp;
 %}
 %option noyywrap
@@ -123,7 +124,7 @@ while {
 }
 
 inline {
-    return(INLINE)
+    return(INLINE);
 }
 
 "_Alignas"                              { return(ALIGNAS); }
@@ -141,6 +142,10 @@ inline {
 {STRINGLITERAL} {
     sscanf(yytext, "%s", yylval.stringvalue);
     return(STRINGLITERAL);
+}
+
+"..." {
+    return(ELLIPSIS);
 }
 
 "+" {
@@ -292,7 +297,7 @@ inline {
 }
 
 {NEWLINE} {
-    return();***************************************************************************
+    return(NEWLINE);
 }
 
 {LPAREN} {
@@ -304,7 +309,7 @@ inline {
 }
 
 {LSQBRACKET} {
-    return(LSQBRACKET)
+    return(LSQBRACKET);
 }
 
 {RSQBRACKET} {
@@ -332,38 +337,38 @@ inline {
     return(ID);    
 }
 
-{HEXLITERALFLOAT} {
-    sscanf(yytext, "%s", yylval.hexfloatvalue);
-    return(HEXLITERALFLOAT);*********************************************************
-}
-
-{HEXLITERAL}|{INTLITERAL} {
-    sscanf(yytext, "%s", yylval.hexvalue);
-    return();********************************************************    
+{INTLITERAL} {
+    yylval.intvalue = atoi(yytext);
+    return(INTLITERAL);
 }
 
 {FLOATLITERAL} {
-    sscanf(yytext, "%s", yylval.floatvalue);
+    yylval.floatvalue = atof(yytext);
     return(FLOATLITERAL);    
 }
 
 {DOUBLELITERAL} {
-    sscanf(yytext, "%s", yylval.doublevalue);
-    return(DOUBLELITERAL);*******************************************
+    yylval.doublevalue = atof(yytext);
+    return(DOUBLELITERAL);
+}
+
+{HEXLITERAL}|{INTLITERAL} {
+    yylval.hexvalue = atoi(yytext);
+    return(HEXLITERAL);
+}
+
+{HEXLITERALFLOAT} {
+    yylval.hexfloatvalue = atof(yytext);
+    return(HEXLITERALFLOAT);
 }
 
 {CHARLITERAL} {
     sscanf(yytext, "%s", yylval.charvalue);
-    return(CHARLITERAL);**********************************************
-}
-
-{INTLITERAL} {
-    sscanf(yytext, "%s", yylval.intvalue);
-    return(INTLITERAL);
+    return(CHARLITERAL);
 }
 
 {INVALIDSUFFIX} {
-    return(INVALIDSUFFIX);**************************************************
+    return(INVALIDSUFFIX);
 }
 
 [ \t]+ /* eat up whitespace */
