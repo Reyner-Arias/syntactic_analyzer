@@ -337,34 +337,34 @@ inline {
     return(ID);    
 }
 
-{HEXLITERALFLOAT} {
-    sscanf(yytext, "%s", yylval.hexfloatvalue);
-    return(HEXLITERALFLOAT);
-}
-
-{HEXLITERAL}|{INTLITERAL} {
-    sscanf(yytext, "%s", yylval.hexvalue);
-    return(HEXLITERAL);
+{INTLITERAL} {
+    yylval.intvalue = atoi(yytext);
+    return(INTLITERAL);
 }
 
 {FLOATLITERAL} {
-    sscanf(yytext, "%s", yylval.floatvalue);
+    yylval.floatvalue = atof(yytext);
     return(FLOATLITERAL);    
 }
 
 {DOUBLELITERAL} {
-    sscanf(yytext, "%s", yylval.doublevalue);
+    yylval.doublevalue = atof(yytext);
     return(DOUBLELITERAL);
+}
+
+{HEXLITERAL}|{INTLITERAL} {
+    yylval.hexvalue = atoi(yytext);
+    return(HEXLITERAL);
+}
+
+{HEXLITERALFLOAT} {
+    yylval.hexfloatvalue = atof(yytext);
+    return(HEXLITERALFLOAT);
 }
 
 {CHARLITERAL} {
     sscanf(yytext, "%s", yylval.charvalue);
     return(CHARLITERAL);
-}
-
-{INTLITERAL} {
-    sscanf(yytext, "%s", yylval.intvalue);
-    return(INTLITERAL);
 }
 
 {INVALIDSUFFIX} {

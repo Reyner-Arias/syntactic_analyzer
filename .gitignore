@@ -57,3 +57,8 @@ a.c
 a
 b.c
 c.c
+z
+bison.output
+bison.tab.c
+bison.tab.h
+lex.yy.c

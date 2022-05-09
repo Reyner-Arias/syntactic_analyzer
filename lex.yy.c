@@ -1,5 +1,5 @@
 
-#line 2 "lex.yy.c"
+#line 3 "lex.yy.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -385,32 +385,32 @@ struct yy_trans_info
 static const flex_int16_t yy_accept[330] =
     {   0,
         0,    0,  104,  102,  101,   84,   66,  102,   56,   74,
-      102,   85,   86,   49,   47,   91,   48,   81,   50,   95,
-       95,   83,   92,   60,   51,   61,   82,   93,   93,   87,
+      102,   85,   86,   49,   47,   91,   48,   81,   50,   94,
+       94,   83,   92,   60,   51,   61,   82,   93,   93,   87,
        88,   78,   93,   93,   93,   93,   93,   93,   93,   93,
        93,   93,   93,   93,   93,   93,   93,   93,   89,   76,
        90,   73,  101,   65,    0,   45,    0,   57,   67,   75,
         0,    0,   54,   58,   52,   59,   53,   80,    0,   55,
-        0,   95,  100,  100,   69,   62,   64,   63,   71,   93,
+        0,   94,  100,  100,   69,   62,   64,   63,   71,   93,
        93,   79,   93,   93,   93,   93,   93,   93,   93,   93,
        93,   93,   93,   93,   93,   93,   93,    8,   93,   93,
 
        93,   93,   93,   93,   16,   93,   93,   93,   93,   93,
-       93,   93,   93,   93,   93,   93,   77,   68,   98,   46,
-       96,   95,   95,   70,   72,   93,   93,   93,   93,   93,
+       93,   93,   93,   93,   93,   93,   77,   68,   99,   46,
+       95,   97,   97,   70,   72,   93,   93,   93,   93,   93,
        93,   93,   93,   93,   93,   93,   93,   93,   93,   93,
        93,   93,   93,   93,   93,   93,   93,   14,   93,   93,
        17,   93,   93,   93,   93,   93,   93,   93,   93,   93,
-       93,   93,   93,   93,   93,   93,   96,    0,   95,   93,
+       93,   93,   93,   93,   93,   93,   95,    0,   97,   93,
        93,   93,   93,   93,   93,   93,   93,   93,   93,   93,
         1,   93,    3,    4,   93,   93,   93,   93,    9,   10,
        93,   93,   15,   93,   18,   93,   93,   93,   93,   93,
 
        93,   93,   93,   93,   93,   93,   30,   93,   93,    0,
-       96,   97,   93,   93,   93,   37,   93,   93,   93,   93,
+       95,   96,   93,   93,   93,   37,   93,   93,   93,   93,
        93,   93,   93,    2,    5,   93,   93,   93,   93,   13,
        93,   93,   93,   21,   93,   93,   93,   93,   93,   93,
-       28,   93,   93,   32,    0,   97,   93,   93,   93,   93,
+       28,   93,   93,   32,    0,   96,   93,   93,   93,   93,
        93,   93,   93,   93,   93,   93,   93,   93,   12,   11,
        33,   93,   20,   22,   23,   24,   25,   26,   93,   93,
        93,    0,   93,   93,   93,   36,   93,   93,   93,   93,
@@ -419,7 +419,7 @@ static const flex_int16_t yy_accept[330] =
 
         6,   19,   29,   31,   93,   93,   41,   93,   93,   93,
        40,   93,   93,    0,   93,   93,    0,    0,   93,   93,
-        0,    0,   93,   43,    0,   94,   42,   94,    0
+        0,    0,   93,   43,    0,   98,   42,   98,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -675,7 +675,7 @@ static const flex_int32_t yy_rule_can_match_eol[104] =
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 
+    0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
     0, 0, 0, 0,     };
 
 static yy_state_type yy_last_accepting_state;
@@ -703,9 +703,9 @@ char *yytext_ptr;
     #include <stdio.h>
     #include "bison.tab.h"
     FILE* tokensTemp;
-#line 706 "lex.yy.c"
+#line 707 "lex.yy.c"
 /*Rules*/
-#line 708 "lex.yy.c"
+#line 709 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -924,7 +924,7 @@ YY_DECL
 	{
 #line 28 "scannerwithreturns.lex"
 
-#line 927 "lex.yy.c"
+#line 928 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1628,49 +1628,49 @@ case 94:
 YY_RULE_SETUP
 #line 340 "scannerwithreturns.lex"
 {
-    sscanf(yytext, "%s", yylval.hexfloatvalue);
-    return(HEXLITERALFLOAT);
+    yylval.intvalue = atoi(yytext);
+    return(INTLITERAL);
 }
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
 #line 345 "scannerwithreturns.lex"
 {
-    sscanf(yytext, "%s", yylval.hexvalue);
-    return(HEXLITERAL);
+    yylval.floatvalue = atof(yytext);
+    return(FLOATLITERAL);    
 }
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
 #line 350 "scannerwithreturns.lex"
 {
-    sscanf(yytext, "%s", yylval.floatvalue);
-    return(FLOATLITERAL);    
+    yylval.doublevalue = atof(yytext);
+    return(DOUBLELITERAL);
 }
 	YY_BREAK
 case 97:
 YY_RULE_SETUP
 #line 355 "scannerwithreturns.lex"
 {
-    sscanf(yytext, "%s", yylval.doublevalue);
-    return(DOUBLELITERAL);
+    yylval.hexvalue = atoi(yytext);
+    return(HEXLITERAL);
 }
 	YY_BREAK
 case 98:
-/* rule 98 can match eol */
 YY_RULE_SETUP
 #line 360 "scannerwithreturns.lex"
 {
-    sscanf(yytext, "%s", yylval.charvalue);
-    return(CHARLITERAL);
+    yylval.hexfloatvalue = atof(yytext);
+    return(HEXLITERALFLOAT);
 }
 	YY_BREAK
 case 99:
+/* rule 99 can match eol */
 YY_RULE_SETUP
 #line 365 "scannerwithreturns.lex"
 {
-    sscanf(yytext, "%s", yylval.intvalue);
-    return(INTLITERAL);
+    sscanf(yytext, "%s", yylval.charvalue);
+    return(CHARLITERAL);
 }
 	YY_BREAK
 case 100:
@@ -1695,7 +1695,7 @@ YY_RULE_SETUP
 #line 377 "scannerwithreturns.lex"
 ECHO;
 	YY_BREAK
-#line 1698 "lex.yy.c"
+#line 1699 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 

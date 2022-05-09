@@ -30,7 +30,7 @@
 	double doublevalue;
 	int hexvalue;
 	double hexfloatvalue;
-	char charvalue;
+	char charvalue[1];
 	char* stringvalue;
 }
 
