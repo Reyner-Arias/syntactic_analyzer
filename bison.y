@@ -14,6 +14,8 @@
 %token VOID CHAR SHORT INT LONG FLOAT DOUBLE SIGNED UNSIGNED BOOL COMPLEX IMAGINARY TYPEDEF_NAME STRUCT UNION
 %token ENUM CONST RESTRICT VOLATILE ATOMIC CASE IF SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
+%start translation_unit
+
 %type <idvalue> ID
 %type <intvalue> INTLITERAL
 %type <floatvalue> FLOATLITERAL
@@ -46,11 +48,10 @@ primary_expression
 constant
     : INTLITERAL
     | FLOATLITERAL
-    | enumeration_constant
-    ;
-
-enumeration_constant
-    : ID
+    | DOUBLELITERAL
+	| HEXLITERAL
+	| HEXLITERALFLOAT
+	| CHARLITERAL
     ;
 
 string
@@ -315,9 +316,9 @@ enumerator_list
 	| enumerator_list COMMA enumerator
 	;
 
-enumerator	/* identifiers must be flagged as ENUMERATION_CONSTANT */
-	: enumeration_constant EQU constant_expression
-	| enumeration_constant
+enumerator
+	: constant EQU constant_expression
+	| constant
 	;
 
 atomic_type_specifier

@@ -62,3 +62,8 @@ bison.output
 bison.tab.c
 bison.tab.h
 lex.yy.c
+bison.output
+simple.tab.h
+simple.tab.c
+simple.tab.c
+simple.output
