@@ -151,19 +151,22 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
 
     clear_line_buffer();
     while ((in_char = getc(file)) != EOF){
-        if(in_char == '\n' || in_char == EOF){
+        if(in_char == '\n'){
+            fprintf(tmp, "%s\n", line_buffer);
             clear_line_buffer();
-            fprintf(tmp, "%s", line_buffer);
         } else {
             line_buffer_char(in_char);
         }
-        /*if (in_char == '#'){
+        if (in_char == '#'){
             clear_buffer();
-            for (c = getc(file); isalpha(c) || isspace(c); c = getc(file)){
+            for (c = getc(file); isspace(c); c = getc(file)){
+                line_buffer_char(c);
+            }
+            ungetc(c, file);
+            for (c = getc(file); isalpha(c); c = getc(file)){
                 buffer_char(c);
                 line_buffer_char(c);
             }
-            printf("%s\n", line_buffer);
             ungetc(c, file);
             if (!strcmp(buffer, "include"))
             {
@@ -211,14 +214,16 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                     }
                     if(!isInclude(buffer, ancestors, ancestorsIndex)){
                         newArray nextAncestorsDef, tmpDef;
-                        char lFilename[600];
+                        char lFilename[1024];
 
                         sprintf(lFilename, "/usr/include/%s", buffer);
                         nextAncestorsDef.index = 0;
                         concatArray(&nextAncestorsDef, &ancestorsDef);
                         concatArray(&nextAncestorsDef, &localDef);
 
+                        fclose(tmp);
                         tmpDef = preprocessing(lFilename, nextAncestorsDef);
+                        tmp = fopen("cTemp.c", "a+");
                         concatArray(&acumulatedDef, &tmpDef);
                     } else {
                         printf("Warning: There is a cycle in the include directives\n");
@@ -263,7 +268,9 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                         nextAncestorsDef.index = 0;
                         concatArray(&nextAncestorsDef, &ancestorsDef);
                         concatArray(&nextAncestorsDef, &localDef);
+                        fclose(tmp);
                         tmpDef = preprocessing(buffer, nextAncestorsDef);
+                        tmp = fopen("cTemp.c", "a+");
                         concatArray(&acumulatedDef, &tmpDef);
                     } else {
                         printf("Warning: There is a cycle in the include directives\n");
@@ -275,8 +282,10 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                     //Buscar defines
                 }
             } 
-        }*/
+        }
     }
+    fprintf(tmp, "%s\n", line_buffer);
+    clear_line_buffer();
 
     remove(tempfile);
     concatArray(&acumulatedDef, &localDef);
