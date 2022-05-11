@@ -147,144 +147,263 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
         printf("Error! Could not open file\n");
         return;
     }
-    FILE *tmp = fopen("cTemp.c", "a+");
-
+    FILE *tmp;
+    int str = 0;
     clear_line_buffer();
     while ((in_char = getc(file)) != EOF){
         if(in_char == '\n'){
+            tmp = fopen("cTemp.c", "a+");
             fprintf(tmp, "%s\n", line_buffer);
+            fclose(tmp);
             clear_line_buffer();
         } else {
             line_buffer_char(in_char);
         }
-        if (in_char == '#'){
-            clear_buffer();
-            for (c = getc(file); isspace(c); c = getc(file)){
-                line_buffer_char(c);
-            }
-            ungetc(c, file);
-            for (c = getc(file); isalpha(c); c = getc(file)){
-                buffer_char(c);
-                line_buffer_char(c);
-            }
-            ungetc(c, file);
-            if (!strcmp(buffer, "include"))
-            {
-                int angular = 0;
-                int quotes = 0;
-
+        if((str%2)==0){
+            if (in_char == '#'){
                 clear_buffer();
-                for(c = getc(file); c != '<' && c != '\"' && c != '\n' && c != EOF; c = getc(file)){
+                for (c = getc(file); isspace(c); c = getc(file)){
                     line_buffer_char(c);
-                    //Buscar defines actuales
                 }
-                if(c == '<'){
+                ungetc(c, file);
+                for (c = getc(file); isalpha(c); c = getc(file)){
+                    buffer_char(c);
                     line_buffer_char(c);
-                    angular = 1;
-                    for (c = getc(file); angular < 2; c = getc(file)){
+                }
+                ungetc(c, file);
+                if (!strcmp(buffer, "include"))
+                {
+                    int angular = 0;
+                    int quotes = 0;
+
+                    clear_buffer();
+                    for(c = getc(file); c != '<' && c != '\"' && c != '\n' && c != EOF; c = getc(file)){
                         line_buffer_char(c);
-                        if (c == '>'){
-                            angular = 2;
-                        } else if (c == '\n')
-                        {
-                            printf("Warning: There is no left angular bracket in the #include directive\n");
-                            fprintf(tmp, "%s", line_buffer);
-                            clear_line_buffer();
-                            angular = 3;
-                        } else if (c == 0)
-                        {
-                            printf("Warning: Invalid character in a file\n");
-                            ungetc(c, file);
-                            line_buffer[line_buffer_index-1] = 0;
-                            line_buffer_index--;
-                            fprintf(tmp, "%s", line_buffer);
-                            angular = 3;
-                        } else
-                        {
-                            buffer_char(c);
-                        } 
+                        //Buscar defines actuales
                     }
-                    ungetc(c, file);
-                    if (angular == 3) continue;
+                    if(c == '<'){
+                        line_buffer_char(c);
+                        angular = 1;
+                        for (c = getc(file); angular < 2; c = getc(file)){
+                            line_buffer_char(c);
+                            //Buscar defines
+                            if (c == '>'){
+                                angular = 2;
+                            } else if (c == '\n')
+                            {
+                                printf("Warning: There is no left angular bracket in the #include directive\n");
+                                tmp = fopen("cTemp.c", "a+");
+                                fprintf(tmp, "%s", line_buffer);
+                                fclose(tmp);
+                                clear_line_buffer();
+                                angular = 3;
+                            } else if (c == 0)
+                            {
+                                printf("Warning: Invalid character in a file\n");
+                                ungetc(c, file);
+                                line_buffer[line_buffer_index-1] = 0;
+                                line_buffer_index--;
+                                tmp = fopen("cTemp.c", "a+");
+                                fprintf(tmp, "%s", line_buffer);
+                                fclose(tmp);
+                                angular = 3;
+                            } else
+                            {
+                                buffer_char(c);
+                            } 
+                        }
+                        ungetc(c, file);
+                        if (angular == 3) continue;
+                        if (buffer_index == 0)
+                        {
+                            printf("Warning: Expected filename\n");
+                            tmp = fopen("cTemp.c", "a+");
+                            fprintf(tmp, "%s", line_buffer);
+                            fclose(tmp);
+                            continue;
+                        }
+                        if(!isInclude(buffer, ancestors, ancestorsIndex)){
+                            newArray nextAncestorsDef, tmpDef;
+                            char lFilename[1024];
+
+                            sprintf(lFilename, "/usr/include/%s", buffer);
+                            nextAncestorsDef.index = 0;
+                            concatArray(&nextAncestorsDef, &ancestorsDef);
+                            concatArray(&nextAncestorsDef, &localDef);
+                            
+                            tmpDef = preprocessing(lFilename, nextAncestorsDef);
+                            concatArray(&acumulatedDef, &tmpDef);
+                        } else {
+                            printf("Warning: There is a cycle in the include directives\n");
+                            tmp = fopen("cTemp.c", "a+");
+                            fprintf(tmp, "%s", line_buffer);
+                            fclose(tmp);
+                            continue;
+                        }
+                    } else if(c == '\"'){
+                        line_buffer_char(c);
+                        quotes = 1;
+                        for (c = getc(file); quotes < 2; c = getc(file)){
+                            line_buffer_char(c);
+                            //Buscar defines
+                            if (c == '\"'){
+                                quotes = 2;
+                            } else if (c == '\n')
+                            {
+                                printf("Warning: There is no left angular bracket in the #include directive\n");
+                                tmp = fopen("cTemp.c", "a+");
+                                fprintf(tmp, "%s", line_buffer);
+                                fclose(tmp);
+                                clear_line_buffer();
+                                quotes = 3;
+                            } else if (c == 0)
+                            {
+                                printf("Warning: Invalid character in a file\n");
+                                ungetc(c, file);
+                                line_buffer[line_buffer_index-1] = 0;
+                                line_buffer_index--;
+                                tmp = fopen("cTemp.c", "a+");
+                                fprintf(tmp, "%s", line_buffer);
+                                fclose(tmp);
+                                quotes = 3;
+                            } else
+                            {
+                                buffer_char(c);
+                            } 
+                        }
+                        if (quotes == 3) continue;
+                        if (buffer_index == 0)
+                        {
+                            printf("Warning: Expected filename\n");
+                            tmp = fopen("cTemp.c", "a+");
+                            fprintf(tmp, "%s", line_buffer);
+                            fclose(tmp);
+                            continue;
+                        }
+                        if(!isInclude(buffer, ancestors, ancestorsIndex)){
+                            newArray nextAncestorsDef, tmpDef;
+                            nextAncestorsDef.index = 0;
+                            concatArray(&nextAncestorsDef, &ancestorsDef);
+                            concatArray(&nextAncestorsDef, &localDef);
+                            
+                            tmpDef = preprocessing(buffer, nextAncestorsDef);
+                            concatArray(&acumulatedDef, &tmpDef);
+                        } else {
+                            printf("Warning: There is a cycle in the include directives\n");
+                            tmp = fopen("cTemp.c", "a+");
+                            fprintf(tmp, "%s", line_buffer);
+                            fclose(tmp);
+                            continue;
+                        }
+                    } else {
+                        tmp = fopen("cTemp.c", "a+");
+                        fprintf(tmp, "%s", line_buffer);
+                        fclose(tmp);
+                    }
+                } else if(!strcmp(buffer, "define")){
+                    clear_buffer();
+                    int section = 0;
+                    tuple actualDef;
+                    for (c = getc(file); c != '\n' && c != EOF; c = getc(file)){
+                        line_buffer_char(c);
+                        if (section == 0)
+                        {
+                            if((isalpha(c) || c == '_') && buffer_index == 0){
+                                buffer_char(c);
+                            }
+                            else if ((isalnum(c) || c == '_') && buffer_index > 0)
+                            {
+                                buffer_char(c);
+                            }
+                            else if (isspace(c) && buffer_index > 0)
+                            {
+                                section++;
+                                strcpy(actualDef.identifier, buffer);
+                                clear_buffer();
+                            }
+                            else if (!isspace(c))
+                            {
+                                printf("Warning: Macro names must be identifiers\n");
+                                tmp = fopen("cTemp.c", "a+");
+                                fprintf(tmp, "%s", line_buffer);
+                                fclose(tmp);
+                                section = 2;
+                            }
+                        }
+                        else if (section == 1)
+                        {
+                            if (isspace(c) && buffer_index == 0)
+                            {
+                                continue;
+                            } else 
+                            {
+                                buffer_char(c);
+                            }
+                        }
+                    }
+                    if(section == 2) continue;
                     if (buffer_index == 0)
                     {
-                        printf("Warning: Expected filename\n");
-                        fprintf(tmp, "%s", line_buffer);
-                        continue;
-                    }
-                    if(!isInclude(buffer, ancestors, ancestorsIndex)){
-                        newArray nextAncestorsDef, tmpDef;
-                        char lFilename[1024];
-
-                        sprintf(lFilename, "/usr/include/%s", buffer);
-                        nextAncestorsDef.index = 0;
-                        concatArray(&nextAncestorsDef, &ancestorsDef);
-                        concatArray(&nextAncestorsDef, &localDef);
-
-                        fclose(tmp);
-                        tmpDef = preprocessing(lFilename, nextAncestorsDef);
+                        printf("Warning: Expected an expresion\n");
                         tmp = fopen("cTemp.c", "a+");
-                        concatArray(&acumulatedDef, &tmpDef);
-                    } else {
-                        printf("Warning: There is a cycle in the include directives\n");
                         fprintf(tmp, "%s", line_buffer);
-                        continue;
-                    }
-                } else if(c == '\"'){
-                    line_buffer_char(c);
-                    quotes = 1;
-                    for (c = getc(file); quotes < 2; c = getc(file)){
-                        line_buffer_char(c);
-                        if (c == '\"'){
-                            quotes = 2;
-                        } else if (c == '\n')
-                        {
-                            printf("Warning: There is no left angular bracket in the #include directive\n");
-                            fprintf(tmp, "%s", line_buffer);
-                            clear_line_buffer();
-                            quotes = 3;
-                        } else if (c == 0)
-                        {
-                            printf("Warning: Invalid character in a file\n");
-                            ungetc(c, file);
-                            line_buffer[line_buffer_index-1] = 0;
-                            line_buffer_index--;
-                            fprintf(tmp, "%s", line_buffer);
-                            quotes = 3;
-                        } else
-                        {
-                            buffer_char(c);
-                        } 
-                    }
-                    if (quotes == 3) continue;
-                    if (buffer_index == 0)
-                    {
-                        printf("Warning: Expected filename\n");
-                        fprintf(tmp, "%s", line_buffer);
-                        continue;
-                    }
-                    if(!isInclude(buffer, ancestors, ancestorsIndex)){
-                        newArray nextAncestorsDef, tmpDef;
-                        nextAncestorsDef.index = 0;
-                        concatArray(&nextAncestorsDef, &ancestorsDef);
-                        concatArray(&nextAncestorsDef, &localDef);
                         fclose(tmp);
-                        tmpDef = preprocessing(buffer, nextAncestorsDef);
-                        tmp = fopen("cTemp.c", "a+");
-                        concatArray(&acumulatedDef, &tmpDef);
-                    } else {
-                        printf("Warning: There is a cycle in the include directives\n");
-                        fprintf(tmp, "%s", line_buffer);
                         continue;
                     }
-                } else {
-                    fprintf(tmp, "%s", line_buffer);
-                    //Buscar defines
+                    strcpy(actualDef.expression, buffer);
+                    localDef.defines[localDef.index] = actualDef;
+                    localDef.index++;
+                    //printf("%s:%s\n", actualDef.identifier, actualDef.expression);
                 }
-            } 
+            } else if(isalpha(in_char) || in_char == '_'){
+                clear_buffer();
+                buffer_char(in_char);
+                for(c = getc(file); isalnum(c) || c == '_'; c = getc(file)){
+                    buffer_char(c);
+                }
+                int flag = 0;
+                ungetc(c, file);
+                printf("Buffer: %s\n", buffer);
+                for(int i = localDef.index-1; i > -1; i--){
+                    printf("LocalDef: id(%s), ex(%s)\n", localDef.defines[i].identifier, localDef.defines[i].expression);
+                    if(!strcmp(buffer, localDef.defines[i].identifier)){
+                        tmp = fopen("cTemp.c", "a+");
+                        fprintf(tmp, "%s", localDef.defines[i].expression);
+                        fclose(tmp);
+                        flag = 1;
+                    }
+                }
+                for(int i = acumulatedDef.index-1; i > -1; i--){
+                    printf("AcumulatedDef: id(%s), ex(%s)\n", acumulatedDef.defines[i].identifier, acumulatedDef.defines[i].expression);
+                    if(!strcmp(buffer, acumulatedDef.defines[i].identifier)){
+                        tmp = fopen("cTemp.c", "a+");
+                        fprintf(tmp, "%s", acumulatedDef.defines[i].expression);
+                        fclose(tmp);
+                        flag = 1;
+                    }
+                }
+                for(int i = ancestorsDef.index-1; i > -1; i--){
+                    printf("AncestorsDef: id(%s), ex(%s)\n", ancestorsDef.defines[i].identifier, ancestorsDef.defines[i].expression);
+                    if(!strcmp(buffer, ancestorsDef.defines[i].identifier)){
+                        tmp = fopen("cTemp.c", "a+");
+                        fprintf(tmp, "%s", ancestorsDef.defines[i].expression);
+                        fclose(tmp);
+                        flag = 1;
+                    }
+                }
+                if(flag == 1) continue;
+                tmp = fopen("cTemp.c", "a+");
+                fprintf(tmp, "%s", buffer);
+                fclose(tmp);
+                clear_line_buffer();
+            } else if(in_char == '\"'){
+                str++;
+            }
         }
     }
+    tmp = fopen("cTemp.c", "a+");
     fprintf(tmp, "%s\n", line_buffer);
+    fclose(tmp);
     clear_line_buffer();
 
     remove(tempfile);
