@@ -159,6 +159,7 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
         } else {
             line_buffer_char(in_char);
         }
+        if(in_char == '\"') str++;
         if((str%2)==0){
             if (in_char == '#'){
                 clear_buffer();
@@ -356,6 +357,12 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                     //printf("%s:%s\n", actualDef.identifier, actualDef.expression);
                 }
             } else if(isalpha(in_char) || in_char == '_'){
+                tmp = fopen("cTemp.c", "a+");
+                line_buffer[line_buffer_index-1] = 0;
+                line_buffer_index--;
+                fprintf(tmp, "%s", line_buffer);
+                fclose(tmp);
+                clear_line_buffer();
                 clear_buffer();
                 buffer_char(in_char);
                 for(c = getc(file); isalnum(c) || c == '_'; c = getc(file)){
@@ -363,9 +370,7 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                 }
                 int flag = 0;
                 ungetc(c, file);
-                printf("Buffer: %s\n", buffer);
-                for(int i = localDef.index-1; i > -1; i--){
-                    printf("LocalDef: id(%s), ex(%s)\n", localDef.defines[i].identifier, localDef.defines[i].expression);
+                for(int i = localDef.index-1; i > -1 && flag == 0; i--){
                     if(!strcmp(buffer, localDef.defines[i].identifier)){
                         tmp = fopen("cTemp.c", "a+");
                         fprintf(tmp, "%s", localDef.defines[i].expression);
@@ -373,8 +378,8 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                         flag = 1;
                     }
                 }
-                for(int i = acumulatedDef.index-1; i > -1; i--){
-                    printf("AcumulatedDef: id(%s), ex(%s)\n", acumulatedDef.defines[i].identifier, acumulatedDef.defines[i].expression);
+                if(flag == 1) continue;
+                for(int i = acumulatedDef.index-1; i > -1 && flag == 0; i--){
                     if(!strcmp(buffer, acumulatedDef.defines[i].identifier)){
                         tmp = fopen("cTemp.c", "a+");
                         fprintf(tmp, "%s", acumulatedDef.defines[i].expression);
@@ -382,8 +387,8 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                         flag = 1;
                     }
                 }
-                for(int i = ancestorsDef.index-1; i > -1; i--){
-                    printf("AncestorsDef: id(%s), ex(%s)\n", ancestorsDef.defines[i].identifier, ancestorsDef.defines[i].expression);
+                if(flag == 1) continue;
+                for(int i = ancestorsDef.index-1; i > -1 && flag == 0; i--){
                     if(!strcmp(buffer, ancestorsDef.defines[i].identifier)){
                         tmp = fopen("cTemp.c", "a+");
                         fprintf(tmp, "%s", ancestorsDef.defines[i].expression);
@@ -395,9 +400,6 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                 tmp = fopen("cTemp.c", "a+");
                 fprintf(tmp, "%s", buffer);
                 fclose(tmp);
-                clear_line_buffer();
-            } else if(in_char == '\"'){
-                str++;
             }
         }
     }
