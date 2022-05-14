@@ -54,6 +54,10 @@ constant
 	| CHARLITERAL
     ;
 
+enumeration_constant
+    : ID
+    ;
+
 string
     : STRINGLITERAL
     | FUNC_NAME
@@ -317,8 +321,8 @@ enumerator_list
 	;
 
 enumerator
-	: constant EQU constant_expression
-	| constant
+	: enumeration_constant EQU constant_expression
+	| enumeration_constant
 	;
 
 atomic_type_specifier
@@ -548,10 +552,4 @@ int yyerror(char *s)
 {
 	printf("Syntax Error on line %s\n", s);
 	return 0;
-}
-
-
-int main()
-{
-    return 0;
 }
