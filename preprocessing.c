@@ -179,11 +179,11 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                     int error = 0;
 
                     clear_buffer();
-                    for(c = getc(file); c != '<' && c != '\"' && c != '\n' && c != EOF; c = getc(file)){
+                    for(c = getc(file); c == ' '; c = getc(file)){
                         line_buffer_char(c);
-                        if(!isspace(c)){
-                            error = 1;
-                        }
+                    }
+                    if(!isspace(c) && c != '<' && c != '\"'){
+                        error = 1;
                     }
                     if(c == '\n' || c == EOF){
                         printf("%s\n", line_buffer);
@@ -196,7 +196,6 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                         continue;
                     }
                     if(error == 1){
-                        printf("%s\n", line_buffer);
                         printf("Warning: Expected <Filename> or \"Filename\"\n");
                         tmp = fopen("cTemp.c", "a+");
                         fprintf(tmp, "%s", line_buffer);
@@ -235,7 +234,6 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                                 buffer_char(c);
                             } 
                         }
-                        //Buscar defines
                         ungetc(c, file);
                         if (angular == 3) continue;
                         if (buffer_index == 0)
@@ -267,7 +265,6 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                         quotes = 1;
                         for (c = getc(file); quotes < 2; c = getc(file)){
                             line_buffer_char(c);
-                            //Buscar defines
                             if (c == '\"'){
                                 quotes = 2;
                             } else if (c == '\n')
