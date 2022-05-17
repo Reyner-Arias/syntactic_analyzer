@@ -234,6 +234,7 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                                 buffer_char(c);
                             } 
                         }
+                        printf("%c", c);
                         ungetc(c, file);
                         if (angular == 3) continue;
                         if (buffer_index == 0)
@@ -244,6 +245,8 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                             fclose(tmp);
                             continue;
                         }
+                        for (c = getc(file); c != '\n' && c != EOF; c = getc(file));
+                        ungetc(c, file);
                         if(!isInclude(buffer, ancestors, ancestorsIndex)){
                             newArray nextAncestorsDef, tmpDef;
                             char lFilename[1024];
@@ -290,6 +293,7 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                                 buffer_char(c);
                             } 
                         }
+                        ungetc(c, file);
                         if (quotes == 3) continue;
                         if (buffer_index == 0)
                         {
@@ -299,6 +303,8 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                             fclose(tmp);
                             continue;
                         }
+                        for (c = getc(file); c != '\n' && c != EOF; c = getc(file));
+                        ungetc(c, file);
                         if(!isInclude(buffer, ancestors, ancestorsIndex)){
                             newArray nextAncestorsDef, tmpDef;
                             nextAncestorsDef.index = 0;
