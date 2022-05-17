@@ -176,18 +176,40 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                 {
                     int angular = 0;
                     int quotes = 0;
+                    int error = 0;
 
                     clear_buffer();
                     for(c = getc(file); c != '<' && c != '\"' && c != '\n' && c != EOF; c = getc(file)){
                         line_buffer_char(c);
-                        //Buscar defines actuales
+                        if(!isspace(c)){
+                            error = 1;
+                        }
+                    }
+                    if(c == '\n' || c == EOF){
+                        printf("%s\n", line_buffer);
+                        printf("Warning: Expected <Filename> or \"Filename\"\n");
+                        tmp = fopen("cTemp.c", "a+");
+                        fprintf(tmp, "%s\n", line_buffer);
+                        fclose(tmp);
+                        clear_line_buffer();
+                        ungetc(c, file);
+                        continue;
+                    }
+                    if(error == 1){
+                        printf("%s\n", line_buffer);
+                        printf("Warning: Expected <Filename> or \"Filename\"\n");
+                        tmp = fopen("cTemp.c", "a+");
+                        fprintf(tmp, "%s", line_buffer);
+                        fclose(tmp);
+                        clear_line_buffer();
+                        ungetc(c, file);
+                        continue;
                     }
                     if(c == '<'){
                         line_buffer_char(c);
                         angular = 1;
                         for (c = getc(file); angular < 2; c = getc(file)){
                             line_buffer_char(c);
-                            //Buscar defines
                             if (c == '>'){
                                 angular = 2;
                             } else if (c == '\n')
@@ -213,6 +235,7 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                                 buffer_char(c);
                             } 
                         }
+                        //Buscar defines
                         ungetc(c, file);
                         if (angular == 3) continue;
                         if (buffer_index == 0)
@@ -226,8 +249,6 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                         if(!isInclude(buffer, ancestors, ancestorsIndex)){
                             newArray nextAncestorsDef, tmpDef;
                             char lFilename[1024];
-
-                            sprintf(lFilename, "/usr/include/%s", buffer);
                             nextAncestorsDef.index = 0;
                             concatArray(&nextAncestorsDef, &ancestorsDef);
                             concatArray(&nextAncestorsDef, &localDef);
@@ -328,6 +349,7 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                                 tmp = fopen("cTemp.c", "a+");
                                 fprintf(tmp, "%s", line_buffer);
                                 fclose(tmp);
+                                clear_line_buffer();
                                 section = 2;
                             }
                         }
@@ -340,9 +362,21 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                             {
                                 buffer_char(c);
                             }
-                        }
+                        } 
                     }
-                    if(section == 2) continue;
+                    if(c == '\n' && section == 0) {
+                        printf("Warning: Expected an expresion\n");
+                        tmp = fopen("cTemp.c", "a+");
+                        fprintf(tmp, "%s", line_buffer);
+                        fclose(tmp);
+                        continue;
+                    }
+                    if(section == 2) {
+                        tmp = fopen("cTemp.c", "a+");
+                        fprintf(tmp, "%s\n", line_buffer);
+                        fclose(tmp);
+                        continue;
+                    }
                     if (buffer_index == 0)
                     {
                         printf("Warning: Expected an expresion\n");
@@ -354,6 +388,7 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                     strcpy(actualDef.expression, buffer);
                     localDef.defines[localDef.index] = actualDef;
                     localDef.index++;
+                    clear_line_buffer();
                     //printf("%s:%s\n", actualDef.identifier, actualDef.expression);
                 }
             } else if(isalpha(in_char) || in_char == '_'){
