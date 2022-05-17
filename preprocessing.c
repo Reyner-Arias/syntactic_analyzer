@@ -12,6 +12,7 @@ int line_buffer_index = 0;
 string ancestors[512];
 int ancestorsIndex = 0;
 int fileCounter = 0;
+FILE *tmp;
 
 typedef struct Tuples
 {
@@ -74,6 +75,40 @@ void concatArray(newArray* original, newArray* extension){
         }
         original->index++;
     }
+}
+
+int replace(newArray localDef, newArray acumulatedDef, newArray ancestorsDef){
+    int flag = 0;
+    for(int i = localDef.index-1; i > -1 && flag == 0; i--){
+        if(!strcmp(buffer, localDef.defines[i].identifier)){
+            tmp = fopen("cTemp.c", "a+");
+            fprintf(tmp, "%s", localDef.defines[i].expression);
+            fclose(tmp);
+            flag = 1;
+        }
+    }
+    if(flag == 1) return 0;
+    for(int i = acumulatedDef.index-1; i > -1 && flag == 0; i--){
+        if(!strcmp(buffer, acumulatedDef.defines[i].identifier)){
+            tmp = fopen("cTemp.c", "a+");
+            fprintf(tmp, "%s", acumulatedDef.defines[i].expression);
+            fclose(tmp);
+            flag = 1;
+        }
+    }
+    if(flag == 1) return 0;
+    for(int i = ancestorsDef.index-1; i > -1 && flag == 0; i--){
+        if(!strcmp(buffer, ancestorsDef.defines[i].identifier)){
+            tmp = fopen("cTemp.c", "a+");
+            fprintf(tmp, "%s", ancestorsDef.defines[i].expression);
+            fclose(tmp);
+            flag = 1;
+        }
+    }
+    if(flag == 1) return 0;
+    tmp = fopen("cTemp.c", "a+");
+    fprintf(tmp, "%s", buffer);
+    fclose(tmp);
 }
 
 newArray preprocessing(char* pfileName, newArray ancestorsDef){
@@ -147,7 +182,6 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
         printf("Error! Could not open file\n");
         return;
     }
-    FILE *tmp;
     int str = 0;
     clear_line_buffer();
     while ((in_char = getc(file)) != EOF){
@@ -363,6 +397,10 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                                 continue;
                             } else 
                             {
+                                for(c = getc(file); isalnum(c) || c == '_'; c = getc(file)){
+                                    buffer_char(c);
+                                }
+                                ungetc(c, file);
                                 buffer_char(c);
                             }
                         } 
@@ -406,38 +444,8 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                 for(c = getc(file); isalnum(c) || c == '_'; c = getc(file)){
                     buffer_char(c);
                 }
-                int flag = 0;
                 ungetc(c, file);
-                for(int i = localDef.index-1; i > -1 && flag == 0; i--){
-                    if(!strcmp(buffer, localDef.defines[i].identifier)){
-                        tmp = fopen("cTemp.c", "a+");
-                        fprintf(tmp, "%s", localDef.defines[i].expression);
-                        fclose(tmp);
-                        flag = 1;
-                    }
-                }
-                if(flag == 1) continue;
-                for(int i = acumulatedDef.index-1; i > -1 && flag == 0; i--){
-                    if(!strcmp(buffer, acumulatedDef.defines[i].identifier)){
-                        tmp = fopen("cTemp.c", "a+");
-                        fprintf(tmp, "%s", acumulatedDef.defines[i].expression);
-                        fclose(tmp);
-                        flag = 1;
-                    }
-                }
-                if(flag == 1) continue;
-                for(int i = ancestorsDef.index-1; i > -1 && flag == 0; i--){
-                    if(!strcmp(buffer, ancestorsDef.defines[i].identifier)){
-                        tmp = fopen("cTemp.c", "a+");
-                        fprintf(tmp, "%s", ancestorsDef.defines[i].expression);
-                        fclose(tmp);
-                        flag = 1;
-                    }
-                }
-                if(flag == 1) continue;
-                tmp = fopen("cTemp.c", "a+");
-                fprintf(tmp, "%s", buffer);
-                fclose(tmp);
+                replace(localDef, acumulatedDef, ancestorsDef);
             }
         }
     }
