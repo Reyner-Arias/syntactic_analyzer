@@ -397,16 +397,64 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                                 continue;
                             } else 
                             {
-                                for(c = getc(file); isalnum(c) || c == '_'; c = getc(file)){
-                                    buffer_char(c);
+                                char str[MAXSTLEN*4];
+                                memset(str, 0, sizeof str);
+                                int indexStr = 0;
+                                while(isalnum(c) || c == '_'){
+                                    str[indexStr] = c;
+                                    indexStr++; //Puede dar segmentatio fault
+                                    c = getc(file);
                                 }
-                                ungetc(c, file);
-                                buffer_char(c);
+                                
+                                if(indexStr == 0){
+                                    buffer_char(c);
+                                } else {
+                                    ungetc(c, file);
+                                    int flag = 0;
+                                    for(int i = localDef.index-1; i > -1 && flag == 0; i--){
+                                        if(!strcmp(str, localDef.defines[i].identifier)){
+                                            int j = 0;
+                                            while(localDef.defines[i].expression[j] != 0){
+                                                buffer_char(localDef.defines[i].expression[j]);
+                                                j++;
+                                            }
+                                            flag = 1;
+                                        }
+                                    }
+                                    if(flag == 1) continue;
+                                    for(int i = acumulatedDef.index-1; i > -1 && flag == 0; i--){
+                                        if(!strcmp(str, acumulatedDef.defines[i].identifier)){
+                                            int j = 0;
+                                            while(acumulatedDef.defines[i].expression[j] != 0){
+                                                buffer_char(acumulatedDef.defines[i].expression[j]);
+                                                j++;
+                                            }
+                                            flag = 1;
+                                        }
+                                    }
+                                    if(flag == 1) continue;
+                                    for(int i = ancestorsDef.index-1; i > -1 && flag == 0; i--){
+                                        if(!strcmp(str, ancestorsDef.defines[i].identifier)){
+                                            int j = 0;
+                                            while(ancestorsDef.defines[i].expression[j] != 0){
+                                                buffer_char(ancestorsDef.defines[i].expression[j]);
+                                                j++;
+                                            }
+                                            flag = 1;
+                                        }
+                                    }
+                                    if(flag == 1) continue;
+                                    else{
+                                        for(int i = 0; i < indexStr; i++){
+                                            buffer_char(str[i]);
+                                        }
+                                    }
+                                }
                             }
                         } 
                     }
                     if(c == '\n' && section == 0) {
-                        printf("Warning: Expected an expresion\n");
+                        printf("Warning: Expected an expression\n");
                         tmp = fopen("cTemp.c", "a+");
                         fprintf(tmp, "%s", line_buffer);
                         fclose(tmp);
