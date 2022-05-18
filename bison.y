@@ -1,7 +1,11 @@
 %{
     #include <stdio.h>
     int yylex();
-    int yyerror(char *s);
+    void yyerror(const char *s);
+	extern int yylineno;
+    extern int column;
+    extern char *lineptr;
+    #define YYERROR_VERBOSE 1
 %}
 
 %token LPAREN RPAREN LSQBRACKET RSQBRACKET LBRACKET RBRACKET
@@ -548,8 +552,11 @@ declaration_list
 
 %%
 
-int yyerror(char *s)
+void yyerror(const char *str)
 {
-	printf("Syntax Error on line %s\n", s);
-	return 0;
+    fprintf(stderr,"error: %s in line %d, column %d\n", str, yylineno, column);
+    fprintf(stderr,"%s", lineptr);
+    for(int i = 0; i < column - 1; i++)
+        fprintf(stderr,"_");
+    fprintf(stderr,"^\n");
 }
