@@ -2,6 +2,18 @@
 #include <string.h>
 #include "preprocessing.c"
 
+void command(char c []){
+    char command[256];
+    strcpy(command, c);
+    system(command);
+}
+
+void compile(){
+    command("flex -l scannerwithreturns.lex");
+    command("bison -dv bison.y");
+    command("gcc -o test bison.tab.c lex.yy.c -lfl");
+}
+
 int main(int argc, char *argv[])
 {
     newArray ancestorsDef;
@@ -16,4 +28,5 @@ int main(int argc, char *argv[])
     remove("cTemp.c");
     preprocessing(argv[1], ancestorsDef);
     remove("interTemp.c");
+    compile();
 }

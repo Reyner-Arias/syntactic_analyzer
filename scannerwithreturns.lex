@@ -411,4 +411,5 @@ int main()
     tokensTemp = fopen("tokensTemp", "w");
     yyin = fopen( "cTemp.c", "r" );
     yylex();
+    yyparse();
 }
