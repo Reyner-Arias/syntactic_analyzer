@@ -505,8 +505,8 @@ jump_statement
 	;
 
 translation_unit
-	: external_declaration
-	| translation_unit external_declaration
+	: external_declarationb 
+	| translation_unit external_declaration 
 	;
 
 external_declaration
@@ -536,13 +536,6 @@ void yyerror(const char *str)
     fprintf(stderr,"error: %s in line %d, column %d\n", str, yylineno, column);
     fprintf(stderr,"%s", lineptr);
     for(int i = 0; i < column - 1; i++)
-        fprintf(stderr,"_");
+    fprintf(stderr,"_");
     fprintf(stderr,"^\n");
-}
-
-int main()
-{
-    openFile();
-    yyparse();
-    free(lineptr);
 }

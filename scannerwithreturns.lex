@@ -61,11 +61,9 @@ static int next_column = 1;
     }
 %}
 
-%option noyywrap noinput nounput yylineno
+%option noinput nounput yylineno
 
 %%
-"/*"                                    { comment(); }
-"//".*                                    { /* consume //-comment */ }
 
 "auto"					{ return(AUTO); }
 "break"					{ return(BREAK); }
@@ -186,25 +184,6 @@ int yywrap(void)        /* called at end of input */
     return 1;           /* terminate now */
 }
 
-static void comment(void)
-{
-    int c;
-
-    while ((c = input()) != 0)
-        if (c == '*')
-        {
-            while ((c = input()) == '*')
-                ;
-
-            if (c == '/')
-                return;
-
-            if (c == 0)
-                break;
-        }
-    yyerror("unterminated comment");
-}
-
 static int check_type(void)
 {
     switch (sym_type(yytext))
@@ -218,8 +197,11 @@ static int check_type(void)
     }
 }
 
-int openFile(){
+int main(){
     yyin = fopen( "cTemp.c", "r" );
+    yyparse();
+    fprintf(stderr, "holaaaaaa\n");
+    free(lineptr);
 }
 
 size_t min(size_t a, size_t b) {
