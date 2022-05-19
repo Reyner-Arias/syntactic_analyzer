@@ -28,6 +28,5 @@ int main(int argc, char *argv[])
     
     remove("cTemp.c");
     preprocessing(argv[1], ancestorsDef);
-    remove("interTemp.c");
     compile();
 }
