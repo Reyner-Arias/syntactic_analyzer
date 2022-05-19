@@ -505,8 +505,8 @@ jump_statement
 	;
 
 translation_unit
-	: external_declarationb 
-	| translation_unit external_declaration 
+	: external_declaration
+	| translation_unit external_declaration
 	;
 
 external_declaration
@@ -526,16 +526,9 @@ declaration_list
 
 %%
 #include <stdio.h>
-extern int yylineno;
-extern int column;
-extern char *lineptr;
-#define YYERROR_VERBOSE 1
 
-void yyerror(const char *str)
+void yyerror(const char *s)
 {
-    fprintf(stderr,"error: %s in line %d, column %d\n", str, yylineno, column);
-    fprintf(stderr,"%s", lineptr);
-    for(int i = 0; i < column - 1; i++)
-    fprintf(stderr,"_");
-    fprintf(stderr,"^\n");
+	fflush(stdout);
+	fprintf(stderr, "*** %s\n", s);
 }
