@@ -526,15 +526,23 @@ declaration_list
 
 %%
 #include <stdio.h>
+extern int yylineno;
+extern int column;
+extern char *lineptr;
+#define YYERROR_VERBOSE 1
 
-void yyerror(const char *s)
+void yyerror(const char *str)
 {
-	fflush(stdout);
-	fprintf(stderr, "*** %s\n", s);
+    fprintf(stderr,"error: %s in line %d, column %d\n", str, yylineno, column);
+    fprintf(stderr,"%s", lineptr);
+    for(int i = 0; i < column - 1; i++)
+        fprintf(stderr,"_");
+    fprintf(stderr,"^\n");
 }
 
 int main()
 {
     openFile();
     yyparse();
+    free(lineptr);
 }
