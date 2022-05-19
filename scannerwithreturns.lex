@@ -1,7 +1,7 @@
 /*Definitions*/
 %{
     #include <stdio.h>
-    #include "bison.tab.h"
+    #include "simple.tab.h"
     FILE* tokensTemp;
     static int next_column = 1;
     int column = 1;

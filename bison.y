@@ -42,7 +42,7 @@
 
 %%
 primary_expression
-    : ID 
+    : ID
     | constant 
     | string 
     | LPAREN expression RPAREN 

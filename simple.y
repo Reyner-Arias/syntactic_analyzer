@@ -1,7 +1,11 @@
 %{
     #include <stdio.h>
     int yylex();
-    int yyerror(char *s);
+    void yyerror(const char *s);
+	extern int yylineno;
+    extern int column;
+    extern char *lineptr;
+    #define YYERROR_VERBOSE 1
 %}
 
 %token LPAREN RPAREN LSQBRACKET RSQBRACKET LBRACKET RBRACKET
@@ -13,6 +17,8 @@
 %token TYPEDEF EXTERN STATIC THREAD_LOCAL AUTO REGISTER NORETURN STATIC_ASSERT FUNC_NAME
 %token VOID CHAR SHORT INT LONG FLOAT DOUBLE SIGNED UNSIGNED BOOL COMPLEX IMAGINARY TYPEDEF_NAME STRUCT UNION
 %token ENUM CONST RESTRICT VOLATILE ATOMIC CASE IF SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
+
+%start translation_unit
 
 %type <idvalue> ID
 %type <intvalue> INTLITERAL
@@ -35,36 +41,17 @@
 }
 
 %%
-primary_expression
-    : ID 
-    | constant 
-    | string 
-    ;
-
-constant
-    : INTLITERAL
-    | FLOATLITERAL
-    | CHARLITERAL
-    | HEXLITERALFLOAT
-    | HEXLITERAL
-    | DOUBLELITERAL
-    ;
-
-string
-    : STRINGLITERAL
-    | FUNC_NAME
-    ;
-
+    translation_unit
+        : RETURN INTLITERAL SEMICOLON {printf("jodase");}
+        | error
+        ;
 %%
 
-int yyerror(char *s)
+void yyerror(const char *str)
 {
-	printf("Syntax Error on line %s\n", s);
-	return 0;
-}
-
-
-int main()
-{
-    return 0;
+    fprintf(stderr,"error: %s in line %d, column %d\n", str, yylineno, column);
+    fprintf(stderr,"%s", lineptr);
+    for(int i = 0; i < column - 1; i++)
+        fprintf(stderr,"_");
+    fprintf(stderr,"^\n");
 }
