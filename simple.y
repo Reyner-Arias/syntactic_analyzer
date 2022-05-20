@@ -16,6 +16,9 @@
 %token	ALIGNAS ALIGNOF ATOMIC GENERIC NORETURN STATIC_ASSERT THREAD_LOCAL
 
 %start translation_unit
+
+%error-verbose
+
 %%
 
 primary_expression
@@ -527,8 +530,13 @@ declaration_list
 %%
 #include <stdio.h>
 
-void yyerror(const char *s)
+extern int yylineno;
+extern int column;
+
+
+#define YYERROR_VERBOSE 1
+
+void yyerror(const char *str)
 {
-	fflush(stdout);
-	fprintf(stderr, "*** %s\n", s);
+    fprintf(stderr,"error: %s, in line: %d, in column: %d\n", str, yylineno, column);
 }

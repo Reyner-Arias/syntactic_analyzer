@@ -1,1 +1,3 @@
-int return 10;
+int main(){
+    return int;
+}
