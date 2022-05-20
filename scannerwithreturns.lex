@@ -34,10 +34,17 @@ extern int sym_type(const char *);  /* returns type from symbol table */
 static void comment(void);
 static int check_type(void);
 
+char line_buffer[1024];
+int line_buffer_index = 0;
+int tokenCounter = 0;
+
 static int next_column = 1;
     int column = 1;
 
-    #define HANDLE_COLUMN column = next_column; next_column += strlen(yytext)
+    #define HANDLE_COLUMN column = next_column; next_column += strlen(yytext);\
+        for (int i = 0; i < strlen(yytext); i++){line_buffer[line_buffer_index] = yytext[i]; line_buffer_index++;}\
+        line_buffer[line_buffer_index] = ' '; line_buffer_index++; tokenCounter++;\
+        if (line_buffer_index > 1024-1) {printf("Buffer overflow\n"); exit(-1);}
 
 %}
 
@@ -155,7 +162,9 @@ static int next_column = 1;
 "^"					{HANDLE_COLUMN; return '^'; }
 "|"					{HANDLE_COLUMN; return '|'; }
 "?"					{HANDLE_COLUMN; return '?'; }
-[\n]                {HANDLE_COLUMN; next_column = 1; column = 1;}
+[\n]                {HANDLE_COLUMN; next_column = 1; column = 1; 
+                        memset(line_buffer, 0, sizeof line_buffer); 
+                        line_buffer_index = 0; tokenCounter = 0;}
 
 {WS}+					{ /* whitespace separates tokens */ }
 .					{ /* discard bad characters */ }

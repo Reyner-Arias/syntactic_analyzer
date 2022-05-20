@@ -532,6 +532,9 @@ declaration_list
 
 extern int yylineno;
 extern int column;
+extern char* yytext;
+extern char line_buffer[1024];
+extern int tokenCounter;
 
 
 #define YYERROR_VERBOSE 1
@@ -539,4 +542,8 @@ extern int column;
 void yyerror(const char *str)
 {
     fprintf(stderr,"error: %s, in line: %d, in column: %d\n", str, yylineno, column);
+    fprintf(stderr,"%s \n", line_buffer);
+	for(int i = 0; i < column + tokenCounter - 2; i++)
+        fprintf(stderr,"_");
+    fprintf(stderr,"^\n");
 }
