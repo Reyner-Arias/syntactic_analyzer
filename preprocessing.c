@@ -135,6 +135,7 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
         tmp = fopen("cTemp.c", "a+");
         fprintf(tmp, "%s\n", line_buffer);
         fclose(tmp);
+        acumulatedDef.index = -1;
         return acumulatedDef;
     }
     char tempfile[12];
@@ -177,7 +178,6 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
     fclose(inFile);
     fclose(wComments);
 
-
     // Start analyzing the file without comments
     FILE *file = fopen(tempfile, "r");
     if (file == NULL)
@@ -219,7 +219,7 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                     for(c = getc(file); c == ' '; c = getc(file)){
                         line_buffer_char(c);
                     }
-                    if(!isspace(c) && c != '<' && c != '\"'){
+                    if(!isspace(c) && c != '\"'){
                         error = 1;
                     }
                     if(c == '\n' || c == EOF){
@@ -241,79 +241,7 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                         ungetc(c, file);
                         continue;
                     }
-                    if(c == '<'){
-                        line_buffer_char(c);
-                        angular = 1;
-                        for (c = getc(file); angular < 2; c = getc(file)){
-                            line_buffer_char(c);
-                            if (c == '>'){
-                                angular = 2;
-                            } else if (c == '\n')
-                            {
-                                printf("Warning: There is no left angular bracket in the #include directive\n");
-                                tmp = fopen("cTemp.c", "a+");
-                                fprintf(tmp, "%s", line_buffer);
-                                fclose(tmp);
-                                clear_line_buffer();
-                                angular = 3;
-                            } else if (c == 0)
-                            {
-                                printf("Warning: Invalid character in a file\n");
-                                ungetc(c, file);
-                                line_buffer[line_buffer_index-1] = 0;
-                                line_buffer_index--;
-                                tmp = fopen("cTemp.c", "a+");
-                                fprintf(tmp, "%s", line_buffer);
-                                fclose(tmp);
-                                angular = 3;
-                            } else
-                            {
-                                buffer_char(c);
-                            } 
-                        }
-                        printf("%c", c);
-                        ungetc(c, file);
-                        if (angular == 3) continue;
-                        if (buffer_index == 0)
-                        {
-                            printf("Warning: Expected filename\n");
-                            tmp = fopen("cTemp.c", "a+");
-                            fprintf(tmp, "%s", line_buffer);
-                            fclose(tmp);
-                            continue;
-                        }
-                        for (c = getc(file); c != '\n' && c != EOF; c = getc(file));
-                        ungetc(c, file);
-                        if(!isInclude(buffer, ancestors, ancestorsIndex)){
-                            newArray nextAncestorsDef, tmpDef;
-                            char lFilename1[1024];
-                            char lFilename2[1024];
-                            char lFilename3[1024];
-                            char lFilename4[1024];
-                            sprintf(lFilename1, "/usr/lib/gcc/x86_64-linux-gnu/9/include/%s", buffer);
-                            sprintf(lFilename2, "/usr/local/include/%s", buffer);
-                            sprintf(lFilename3, "/usr/include/x86_64-linux-gnu/%s", buffer);
-                            sprintf(lFilename4, "/usr/include/%s", buffer);
-                            nextAncestorsDef.index = 0;
-                            concatArray(&nextAncestorsDef, &ancestorsDef);
-                            concatArray(&nextAncestorsDef, &localDef);
-                            
-                            tmpDef = preprocessing(lFilename1, nextAncestorsDef);
-                            concatArray(&acumulatedDef, &tmpDef);
-                            tmpDef = preprocessing(lFilename2, nextAncestorsDef);
-                            concatArray(&acumulatedDef, &tmpDef);
-                            tmpDef = preprocessing(lFilename3, nextAncestorsDef);
-                            concatArray(&acumulatedDef, &tmpDef);
-                            tmpDef = preprocessing(lFilename4, nextAncestorsDef);
-                            concatArray(&acumulatedDef, &tmpDef);
-                        } else {
-                            printf("Warning: There is a cycle in the include directives\n");
-                            tmp = fopen("cTemp.c", "a+");
-                            fprintf(tmp, "%s", line_buffer);
-                            fclose(tmp);
-                            continue;
-                        }
-                    } else if(c == '\"'){
+                    if(c == '\"'){
                         line_buffer_char(c);
                         quotes = 1;
                         for (c = getc(file); quotes < 2; c = getc(file)){
@@ -517,8 +445,10 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
     fprintf(tmp, "%s\n", line_buffer);
     fclose(tmp);
     clear_line_buffer();
-
+    
+    fclose(file);
     remove(tempfile);
     concatArray(&acumulatedDef, &localDef);
+    strcpy(ancestors[--ancestorsIndex], "");
     return acumulatedDef;
 }
