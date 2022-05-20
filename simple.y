@@ -515,6 +515,7 @@ translation_unit
 external_declaration
 	: function_definition
 	| declaration
+	| error ';' {yyerrok;}
 	;
 
 function_definition
