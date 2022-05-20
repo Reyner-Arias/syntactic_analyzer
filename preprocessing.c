@@ -132,6 +132,9 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
     if (inFile == NULL)
     {
         printf("Error! Could not open file\n");
+        tmp = fopen("cTemp.c", "a+");
+        fprintf(tmp, "%s\n", line_buffer);
+        fclose(tmp);
         return acumulatedDef;
     }
     char tempfile[12];
@@ -284,6 +287,7 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                         if(!isInclude(buffer, ancestors, ancestorsIndex)){
                             newArray nextAncestorsDef, tmpDef;
                             char lFilename[1024];
+                            sprintf(lFilename, "/usr/include/%s", buffer);
                             nextAncestorsDef.index = 0;
                             concatArray(&nextAncestorsDef, &ancestorsDef);
                             concatArray(&nextAncestorsDef, &localDef);
@@ -456,7 +460,7 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                     if(c == '\n' && section == 0) {
                         printf("Warning: Expected an expression\n");
                         tmp = fopen("cTemp.c", "a+");
-                        fprintf(tmp, "%s", line_buffer);
+                        fprintf(tmp, "%s\n", line_buffer);
                         fclose(tmp);
                         continue;
                     }
