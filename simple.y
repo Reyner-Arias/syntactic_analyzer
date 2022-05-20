@@ -510,12 +510,12 @@ jump_statement
 translation_unit
 	: external_declaration
 	| translation_unit external_declaration
+	| error external_declaration {yyerrok; yyclearin;}
 	;
 
 external_declaration
 	: function_definition
 	| declaration
-	| error ';' {yyerrok;}
 	;
 
 function_definition
