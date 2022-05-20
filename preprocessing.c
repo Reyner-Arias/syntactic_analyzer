@@ -286,13 +286,25 @@ newArray preprocessing(char* pfileName, newArray ancestorsDef){
                         ungetc(c, file);
                         if(!isInclude(buffer, ancestors, ancestorsIndex)){
                             newArray nextAncestorsDef, tmpDef;
-                            char lFilename[1024];
-                            sprintf(lFilename, "/usr/include/%s", buffer);
+                            char lFilename1[1024];
+                            char lFilename2[1024];
+                            char lFilename3[1024];
+                            char lFilename4[1024];
+                            sprintf(lFilename1, "/usr/lib/gcc/x86_64-linux-gnu/9/include/%s", buffer);
+                            sprintf(lFilename2, "/usr/local/include/%s", buffer);
+                            sprintf(lFilename3, "/usr/include/x86_64-linux-gnu/%s", buffer);
+                            sprintf(lFilename4, "/usr/include/%s", buffer);
                             nextAncestorsDef.index = 0;
                             concatArray(&nextAncestorsDef, &ancestorsDef);
                             concatArray(&nextAncestorsDef, &localDef);
                             
-                            tmpDef = preprocessing(lFilename, nextAncestorsDef);
+                            tmpDef = preprocessing(lFilename1, nextAncestorsDef);
+                            concatArray(&acumulatedDef, &tmpDef);
+                            tmpDef = preprocessing(lFilename2, nextAncestorsDef);
+                            concatArray(&acumulatedDef, &tmpDef);
+                            tmpDef = preprocessing(lFilename3, nextAncestorsDef);
+                            concatArray(&acumulatedDef, &tmpDef);
+                            tmpDef = preprocessing(lFilename4, nextAncestorsDef);
                             concatArray(&acumulatedDef, &tmpDef);
                         } else {
                             printf("Warning: There is a cycle in the include directives\n");
